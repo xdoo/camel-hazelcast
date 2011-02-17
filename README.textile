@@ -1,0 +1,203 @@
+h3. camel-hazelcast plugin
+
+Hazelcast is a ligthwight data grid written entirely in Java and published under apache licence. You can find more on "www.hazelcast.com":http://www.hazelcast.com/. Inside the datagrid you can store your data in maps, multimaps (same key, n values), queues, sets, topics and as a special artifact atomic numbers. This camel component focuses on maps, multimaps and atomic numbers. As special feature it provides a simple cluster support.
+
+h3. general usage
+
+A camel-hazelcast URI looks always like:
+
+bc. hazelcast:[map|multimap|atomicnumber|instance]:cachename
+
+An URI without the second prefix is not valid. All additional things like a id for a stored object are provided over header variables.
+
+h3. map cache producer - to("hazelcast:map:foo")
+
+If you want to store a value in a map you can use the map cache producer. The map cache producer provides 5 operations (put, get, update, delete, query). For the first 4 you have to provide the operation inside the "hazelcast.operation.type" header variable. The values are (see also @org.apache.camel.component.hazelcast.HazelcastConstants@):
+
+bc. 	public static final int PUT_OPERATION  = 1;
+	public static final int DELETE_OPERATION = 2;
+	public static final int GET_OPERATION = 3;
+	public static final int UPDATE_OPERATION = 4;
+	public static final int QUERY_OPERATION = 5;
+
+Sample for *put*:
+
+bc. from("direct:put")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION))	.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
+
+Sample for *get*:
+
+bc. from("direct:get")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION))	.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
+.to("seda:out");
+
+Sample for *update*:
+
+bc. from("direct:update")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.UPDATE_OPERATION))
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
+
+Sample for *delete*:
+
+bc. from("direct:delete")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.DELETE_OPERATION))
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
+
+you can call them in your test class with:
+
+bc. template.sendBodyAndHeader("direct:[put|get|update|delete]", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
+
+h3. map cache consumer - from("hazelcast:map:foo")
+
+Hazelcast provides event listeners on their data grid. If you want to be notified if a cache will be manipulated, you can use the map consumer. There're 4 events: *put*, *update*, *delete* and *envict*. The event type will be stored in the "*hazelcast.listener.action*" header variable. The map consumer provides some additional information inside these variables:
+|_. variable|_. meaning|
+|*hazelcast.listener.time*|time of the event in millis|
+|*hazelcast.listener.type*|the map consumer sets here "cachelistener"|
+|*hazelcast.objectId*|the oid of the object|
+|*hazelcast.cache.name*|the name of the cache - e.g. "foo"|
+|*hazelcast.cache.type*|the type of the cache - here map, but can also be multimap|
+
+The object value will be stored within *put* and *update* actions inside the message body.
+
+Here a sample:
+
+bc. from(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
+.log("object...")
+.choice()
+    .when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
+         .log("...added")
+         .to("mock:added")
+    .when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ENVICTED))
+         .log("...envicted")
+         .to("mock:envicted")
+    .when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.UPDATED))
+         .log("...updated")
+         .to("mock:updated")
+    .when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED))
+         .log("...removed")
+         .to("mock:removed")
+    .otherwise()
+         .log("fail!");
+
+h3. multimap cache producer - to("hazelcast:multimap:foo")
+
+A multimap is a cache where you can store n values to one key. The multimap producer provides 4 operations (put, get, removevalue, delete). 
+
+Sample for *put*:
+
+bc. from("direct:put")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION))
+.to(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX));
+
+Sample for *removevalue*:
+
+bc. from("direct:removevalue")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.REMOVEVALUE_OPERATION))
+.to(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX));
+
+To remove a value you have to provide the value you want to remove inside the message body. If you have a multimap object @{key: "4711" values: { "my-foo", "my-bar"}}@ you have to put "my-foo" inside the message body to remove the "my-foo" value.
+
+Sample for *get*:
+
+bc. from("direct:get")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION))
+.to(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX))
+.to("seda:out");
+
+Sample for *delete*:
+
+bc. from("direct:delete")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.DELETE_OPERATION))
+.to(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX)); 
+
+you can call them in your test class with:
+
+bc. template.sendBodyAndHeader("direct:[put|get|removevalue|delete]", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
+
+h3. multimap cache consumer - from("hazelcast:multimap:foo")
+
+For the multimap cache this component provides the same listeners / variables as for the map cache consumer (except the update listener). The only difference is the *multimap* prefix inside the URI. Here is a sample: 
+
+bc. from(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX))
+.log("object...")
+.choice()
+	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
+		.log("...added")
+                .to("mock:added")
+        .when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ENVICTED))
+                .log("...envicted")
+                .to("mock:envicted")
+        .when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED))
+                .log("...removed")
+                .to("mock:removed")
+        .otherwise()
+                .log("fail!");
+
+h3. atomic number producer - to("hazelcast:atomicnumber:foo")
+
+An atomic number is an object that simply provides a grid wide number (long). The operations for this producer are set (set the number with a given value), get, increase (+1), decrease (-1) and destroy.
+
+Sample for *set*:
+
+bc. from("direct:set")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.SETVALUE_OPERATION))
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.ATOMICNUMBER_PREFIX));
+
+Provide the value to set inside the message body (here the value is 10): @template.sendBody("direct:set", 10);@
+
+Sample for *get*:
+
+bc. from("direct:get")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION))
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.ATOMICNUMBER_PREFIX));
+
+You can get the number with @long body = template.requestBody("direct:get", null, Long.class);@.
+
+Sample for *increment*:
+
+bc. from("direct:increment")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.INCREMENT_OPERATION))
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.ATOMICNUMBER_PREFIX)); 
+
+The actual value (after increment) will be provided inside the message body.
+
+Sample for *decrement*:
+
+bc. from("direct:decrement")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.DECREMENT_OPERATION))
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.ATOMICNUMBER_PREFIX));
+
+The actual value (after decrement) will be provided inside the message body.
+
+Sample for *destroy*
+
+bc. from("direct:destroy")
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.DESTROY_OPERATION))
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.ATOMICNUMBER_PREFIX));
+
+h3. instance consumer - from("hazelcast:instance:foo")
+
+Hazelcast makes sense in one single "server node", but it's extremly powerful in a clustered environment. The instance consumer fires if a new cache instance will join or leave the cluster. 
+
+Here's a sample:
+
+bc. from(String.format("hazelcast:%sfoo", HazelcastConstants.INSTANCE_PREFIX))
+.log("instance...")
+.choice()
+	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
+		.log("...added")
+		.to("mock:added")
+	.otherwise()
+		.log("...removed")
+		.to("mock:removed");
+
+Each event provides the following information inside the message header:
+
+|_. variable|_. meaning|
+|*hazelcast.listener.action*| type of event - here *added* or *removed*|
+|*hazelcast.listener.time*|time of the event in millis|
+|*hazelcast.listener.type*|the map consumer sets here "instancelistener"|
+|*hazelcast.instance.host*|host name of the instance|
+|*hazelcast.instance.port*|port number of the instance|
+
+If you have further questions don't hesitate to send a mail to @info(at)catify.com@, or post to the camel mailinglist (preferred way ;) 
