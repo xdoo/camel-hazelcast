@@ -23,12 +23,14 @@ bc. 	public static final int PUT_OPERATION  = 1;
 Sample for *put*:
 
 bc. from("direct:put")
-.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION))	.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION))	
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
 
 Sample for *get*:
 
 bc. from("direct:get")
-.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION))	.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION))	
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
 .to("seda:out");
 
 Sample for *update*:
@@ -50,6 +52,7 @@ bc. template.sendBodyAndHeader("direct:[put|get|update|delete]", "my-foo", Hazel
 h3. map cache consumer - from("hazelcast:map:foo")
 
 Hazelcast provides event listeners on their data grid. If you want to be notified if a cache will be manipulated, you can use the map consumer. There're 4 events: *put*, *update*, *delete* and *envict*. The event type will be stored in the "*hazelcast.listener.action*" header variable. The map consumer provides some additional information inside these variables:
+
 |_. variable|_. meaning|
 |*hazelcast.listener.time*|time of the event in millis|
 |*hazelcast.listener.type*|the map consumer sets here "cachelistener"|
