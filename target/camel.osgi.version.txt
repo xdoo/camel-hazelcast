@@ -1,2 +1,0 @@
-camel.osgi.version.clean = 2.7.0.SNAPSHOT
-                  camel.schema.version = 2.7
