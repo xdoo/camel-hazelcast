@@ -16,6 +16,7 @@
  */
 package org.apache.camel.component.hazelcast.map;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
