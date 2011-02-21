@@ -119,7 +119,7 @@ bc. template.sendBodyAndHeader("direct:[put|get|removevalue|delete]", "my-foo", 
 
 h3. multimap cache consumer - from("hazelcast:multimap:foo")
 
-For the multimap cache this component provides the same listeners / variables as for the map cache consumer (except the update listener). The only difference is the *multimap* prefix inside the URI. Here is a sample: 
+For the multimap cache this component provides the same listeners / variables as for the map cache consumer (except the update and enviction listener). The only difference is the *multimap* prefix inside the URI. Here is a sample: 
 
 bc. from(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX))
 .log("object...")
@@ -127,14 +127,16 @@ bc. from(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX))
 	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
 		.log("...added")
                 .to("mock:added")
-        .when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ENVICTED))
-                .log("...envicted")
-                .to("mock:envicted")
+        //.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ENVICTED))
+        //        .log("...envicted")
+        //        .to("mock:envicted")
         .when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED))
                 .log("...removed")
                 .to("mock:removed")
         .otherwise()
                 .log("fail!");
+
+Enviction will be added as feature, soon (this is a Hazelcast issue).
 
 h3. atomic number producer - to("hazelcast:atomicnumber:foo")
 
