@@ -42,17 +42,22 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 	}
 	
 	public void testEnvict() throws InterruptedException{
-		
-		//prepare mock
 		MockEndpoint out = super.getMockEndpoint("mock:envicted");
 		out.expectedMessageCount(1);
 		
-		MultiMap<Object, Object> map = Hazelcast.getMultiMap("envict");
+		MultiMap<Object, Object> map = Hazelcast.getMultiMap("mm");
 		
 		map.clear();
-		map.put("4711", "my-foo-1");
+		map.put("1", "my-foo-1");
+		map.put("2", "my-foo-2");
+		map.put("3", "my-foo-3");
+		map.put("4", "my-foo-4");
+		map.put("5", "my-foo-5");
+		map.put("6", "my-foo-6");
 		
-		assertMockEndpointsSatisfied(15000, TimeUnit.MILLISECONDS);
+		assertMockEndpointsSatisfied(30000, TimeUnit.MILLISECONDS);
+		
+		map.clear();
 		
 	}
 	
@@ -90,23 +95,6 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
                 		.to("mock:removed")
                 	.otherwise()
                 		.log("fail!");
-				
-				from(String.format("hazelcast:%senvict", HazelcastConstants.MULTIMAP_PREFIX))
-				.log("object...")
-				.choice()
-                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
-                		.log("...added")
-                		.to("mock:added")
-                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ENVICTED))
-                		.log("...envicted")
-                		.to("mock:envicted")
-                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED))
-                		.log("...removed")
-                		.to("mock:removed")
-                	.otherwise()
-                		.log("fail!");
-                		
-			}
 		};
 	}
 	
