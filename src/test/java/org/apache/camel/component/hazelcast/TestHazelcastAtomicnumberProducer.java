@@ -63,13 +63,10 @@ public class TestHazelcastAtomicnumberProducer extends CamelTestSupport {
 	 * TODO: if we'll get the new hazelcast version I'll fix the test.
 	 */
 	public void testDestroy(){
-		Hazelcast.shutdownAll();
 		template.sendBody("direct:set", 10);
 		template.sendBody("direct:destroy", null);
 		
 		//assertTrue(Hazelcast.getInstances().isEmpty());
-		
-		assertTrue(true);
 	}
 	
 	@Override
