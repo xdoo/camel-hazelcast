@@ -28,11 +28,25 @@ import com.hazelcast.core.IMap;
 
 public class TestHazelcastMapConsumer extends CamelTestSupport {
 
+	private IMap<String, Object> map;
+
+	public void setUp() throws Exception{
+		super.setUp();
+		
+		this.map = Hazelcast.getMap("foo");
+		this.map.clear();
+	}
+	
+	public void tearDown()throws Exception{
+		super.tearDown();
+		
+		this.map.clear();
+	}
+
 	public void testAdd() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:added");
 		out.expectedMessageCount(1);
 		
-		IMap<String, Object> map = Hazelcast.getMap("foo");
 		map.put("4711", "my-foo");
 		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
@@ -44,9 +58,6 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 		MockEndpoint out = super.getMockEndpoint("mock:envicted");
 		out.expectedMessageCount(5);
 		
-		IMap<String, Object> map = Hazelcast.getMap("foo");
-		
-		map.clear();
 		map.put("1", "my-foo-1");
 		map.put("2", "my-foo-2");
 		map.put("3", "my-foo-3");
@@ -55,39 +66,29 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 		map.put("6", "my-foo-6");
 		
 		assertMockEndpointsSatisfied(30000, TimeUnit.MILLISECONDS);
-		
-		map.clear();
 	}
 	
 	public void testUpdate() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:updated");
 		out.expectedMessageCount(1);
-		
-		IMap<String, Object> map = Hazelcast.getMap("foo");
-		map.clear();
+
 		map.put("4711", "my-foo");
 		map.replace("4711", "my-fooo");
 		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 		
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.UPDATED);
-
-		map.clear();
 	}
 	
 	public void testRemove() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:removed");
 		out.expectedMessageCount(1);
-		
-		IMap<String, Object> map = Hazelcast.getMap("foo");
-		map.clear();
+
 		map.put("4711", "my-foo");
 		map.remove("4711");
 		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.REMOVED);
-		
-		map.clear();
 	}
 	
 	@Override
