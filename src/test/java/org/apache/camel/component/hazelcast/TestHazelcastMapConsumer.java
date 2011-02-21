@@ -113,24 +113,6 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
                 		.to("mock:removed")
                 	.otherwise()
                 		.log("fail!");
-				
-			from(String.format("hazelcast:%senvict", HazelcastConstants.MAP_PREFIX))
-				.log("object...")
-				.choice()
-                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
-                		.log("...added")
-                		.to("mock:added")
-                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ENVICTED))
-                		.log("...envicted")
-                		.to("mock:envicted")
-                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.UPDATED))
-                		.log("...updated")
-                		.to("mock:updated")
-                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED))
-                		.log("...removed")
-                		.to("mock:removed")
-                	.otherwise()
-                		.log("fail!");
                 		
 			}
 		};
