@@ -97,7 +97,8 @@ public class HazelcastMapProducer extends DefaultProducer {
 	 * @param exchange
 	 */
 	private void query(String query, Exchange exchange) {
-		exchange.getOut().setBody(this.cache.values(new SqlPredicate(query)));
+		Collection<Object> result = this.cache.values(new SqlPredicate(query));
+		exchange.getOut().setBody(result);
 	}
 
 	/**

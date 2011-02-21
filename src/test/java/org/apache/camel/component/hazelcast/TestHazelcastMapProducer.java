@@ -22,7 +22,7 @@ import org.apache.camel.test.CamelTestSupport;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.IMap;
 
-public class TestHazelcastMapProducer extends CamelTestSupport {
+public class TestHazelcastMapProducer extends CamelTestSupport implements Serializable {
 
 	public void testPut() throws InterruptedException{
 		IMap<String, Object> map = Hazelcast.getMap("foo");
@@ -79,7 +79,29 @@ public class TestHazelcastMapProducer extends CamelTestSupport {
 	}
 	
 	public void testQuery(){
-		fail();
+		IMap<String, Object> map = Hazelcast.getMap("foo");
+		map.clear();
+		
+		map.put("1", new Dummy("alpha", 1000));
+		map.put("2", new Dummy("beta", 2000));
+		map.put("3", new Dummy("gamma", 3000));
+		
+		String q1 = "bar > 1000";
+		String q2 = "foo LIKE alp%";
+		
+		template.sendBodyAndHeader("direct:query", null, HazelcastConstants.QUERY, q1);
+		Collection<Dummy> b1 = consumer.receiveBody("seda:out", 5000, Collection.class);
+		
+		assertNotNull(b1);
+		assertEquals(2, b1.size());
+		
+		template.sendBodyAndHeader("direct:query", null, HazelcastConstants.QUERY, q2);
+		Collection<Dummy> b2 = consumer.receiveBody("seda:out", 5000, Collection.class);
+		
+		assertNotNull(b2);
+		assertEquals(1, b2.size());
+		
+		map.clear();
 	}
 	
 	@Override
@@ -106,12 +128,40 @@ public class TestHazelcastMapProducer extends CamelTestSupport {
 				.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
 				
 				from("direct:query")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.DELETE_OPERATION))
+				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.QUERY_OPERATION))
 				.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
 				.to("seda:out");
                 		
 			}
 		};
+	}
+
+	public class Dummy implements Serializable{
+
+		private static final long serialVersionUID = 3688457704655925278L;
+		
+		public Dummy(String foo, int bar){
+			this.foo = foo;
+			this.bar = bar;
+		}
+		
+		private String foo;
+		private int bar;
+		
+		
+		public String getFoo() {
+			return foo;
+		}
+		public void setFoo(String foo) {
+			this.foo = foo;
+		}
+		public int getBar() {
+			return bar;
+		}
+		public void setBar(int bar) {
+			this.bar = bar;
+		}
+		
 	}
 	
 }
