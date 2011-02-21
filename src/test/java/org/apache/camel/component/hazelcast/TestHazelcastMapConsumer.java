@@ -57,6 +57,8 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 		out.expectedMessageCount(1);
 		
 		IMap<String, Object> map = Hazelcast.getMap("foo");
+		map.clear();
+		map.put("4711", "my-foo");
 		map.replace("4711", "my-fooo");
 		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
