@@ -64,6 +64,8 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 		
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.UPDATED);
+
+		map.clear();
 	}
 	
 	public void testRemove() throws InterruptedException{
