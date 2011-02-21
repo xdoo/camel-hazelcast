@@ -32,63 +32,63 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 
 	public void setUp() throws Exception{
 		super.setUp();
-		
+
 		this.map = Hazelcast.getMultiMap("mm");
 		this.map.clear();
 	}
-	
+
 	public void tearDown()throws Exception{
 		super.tearDown();
-		
+
 		this.map.clear();
 	}
 
 	public void testAdd() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:added");
 		out.expectedMessageCount(1);
-		
+
 		map.put("4711", "my-foo");
-		
+
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
-		
+
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.ADDED);
 	}
-	
+
 	/*
 	 * mail from talip (hazelcast) on 21.02.2011:
 	 * MultiMap doesn't support eviction yet. We can and should add this feature.
-	 * 
+	 *
 	 * we leave the test in our code an set the result to asserted by default.
 	 */
 	public void testEnvict() throws InterruptedException{
 		MockEndpoint out = super.getMockEndpoint("mock:envicted");
 		out.expectedMessageCount(1);
-		
+
 		map.put("1", "my-foo-1");
 		map.put("2", "my-foo-2");
 		map.put("3", "my-foo-3");
 		map.put("4", "my-foo-4");
 		map.put("5", "my-foo-5");
 		map.put("6", "my-foo-6");
-		
+
 		//assertMockEndpointsSatisfied(30000, TimeUnit.MILLISECONDS);
 
 		assertTrue(true);
-		
+
 	}
-	
+
 	public void testRemove() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:removed");
 		out.expectedMessageCount(1);
-		
+
 		map.put("4711", "foo");
 		map.remove("4711");
-		
+
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.REMOVED);
-		
+
 	}
-	
+
 	@Override
 	protected RouteBuilder createRouteBuilder() throws Exception {
 		return new RouteBuilder() {
@@ -109,8 +109,9 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
                 	.otherwise()
                 		.log("fail!");
 		};
+	};
 	}
-	
+
 	private void checkHeaders(Map<String, Object> headers, String action){
 		assertEquals(action, headers.get(HazelcastConstants.LISTENER_ACTION));
 		assertEquals(HazelcastConstants.CACHE_LISTENER, headers.get(HazelcastConstants.LISTENER_TYPE));
