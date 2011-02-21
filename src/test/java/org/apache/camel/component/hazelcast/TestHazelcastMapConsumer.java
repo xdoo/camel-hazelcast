@@ -42,14 +42,21 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 	
 	public void testEnvict() throws InterruptedException{
 		MockEndpoint out = super.getMockEndpoint("mock:envicted");
-		out.expectedMessageCount(1);
+		out.expectedMessageCount(5);
 		
-		IMap<String, Object> map = Hazelcast.getMap("envict");
+		IMap<String, Object> map = Hazelcast.getMap("foo");
 		
 		map.clear();
-		map.put("4711", "my-foo-1");
+		map.put("1", "my-foo-1");
+		map.put("2", "my-foo-2");
+		map.put("3", "my-foo-3");
+		map.put("4", "my-foo-4");
+		map.put("5", "my-foo-5");
+		map.put("6", "my-foo-6");
 		
-		assertMockEndpointsSatisfied(15000, TimeUnit.MILLISECONDS);
+		assertMockEndpointsSatisfied(30000, TimeUnit.MILLISECONDS);
+		
+		map.clear();
 	}
 	
 	public void testUpdate() throws InterruptedException{
