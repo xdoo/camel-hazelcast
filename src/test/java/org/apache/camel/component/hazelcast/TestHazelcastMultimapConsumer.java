@@ -41,6 +41,9 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.ADDED);
 	}
 	
+	/*
+	 * TODO --> clarify if enviction based on numbers works on multimaps
+	 */
 	public void testEnvict() throws InterruptedException{
 		MockEndpoint out = super.getMockEndpoint("mock:envicted");
 		out.expectedMessageCount(1);
