@@ -16,6 +16,9 @@
  */
 package org.apache.camel.component.hazelcast;
 
+import java.io.Serializable;
+import java.util.Collection;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.CamelTestSupport;
 
