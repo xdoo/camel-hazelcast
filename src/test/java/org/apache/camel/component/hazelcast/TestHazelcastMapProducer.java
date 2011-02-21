@@ -27,22 +27,29 @@ import com.hazelcast.core.IMap;
 
 public class TestHazelcastMapProducer extends CamelTestSupport implements Serializable {
 
-	public void testPut() throws InterruptedException{
-		IMap<String, Object> map = Hazelcast.getMap("foo");
-		map.clear();
+	private IMap<String, Object> map;
+
+	public void setUp() throws Exception{
+		super.setUp();
 		
+		this.map = Hazelcast.getMap("foo");
+		this.map.clear();
+	}
+	
+	public void tearDown()throws Exception{
+		super.tearDown();
+		
+		this.map.clear();
+	}
+
+	public void testPut() throws InterruptedException{
 		template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
 		
 		assertTrue(map.containsKey("4711"));
 		assertEquals("my-foo", map.get("4711"));
-		
-		map.clear();
 	}
 	
 	public void testUpdate(){
-		IMap<String, Object> map = Hazelcast.getMap("foo");
-		map.clear();
-		
 		template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
 		
 		assertTrue(map.containsKey("4711"));
@@ -50,41 +57,26 @@ public class TestHazelcastMapProducer extends CamelTestSupport implements Serial
 		
 		template.sendBodyAndHeader("direct:update", "my-fooo", HazelcastConstants.OBJECT_ID, "4711");
 		assertEquals("my-fooo", map.get("4711"));
-		
-		map.clear();
 	}
 	
 	public void testGet(){
-		IMap<String, Object> map = Hazelcast.getMap("foo");
-		map.clear();
-		
 		map.put("4711", "my-foo");
 		
 		template.sendBodyAndHeader("direct:get", null, HazelcastConstants.OBJECT_ID, "4711");
 		String body = consumer.receiveBody("seda:out", 5000, String.class);
 		
 		assertEquals("my-foo", body);
-		
-		map.clear();
 	}
 	
 	public void testDelete(){
-		IMap<String, Object> map = Hazelcast.getMap("foo");
-		map.clear();
-		
 		map.put("4711", "my-foo");
 		assertEquals(1, map.size());
 		
 		template.sendBodyAndHeader("direct:delete", null, HazelcastConstants.OBJECT_ID, "4711");
 		assertEquals(0, map.size());
-		
-		map.clear();
 	}
 	
 	public void testQuery(){
-		IMap<String, Object> map = Hazelcast.getMap("foo");
-		map.clear();
-		
 		map.put("1", new Dummy("alpha", 1000));
 		map.put("2", new Dummy("beta", 2000));
 		map.put("3", new Dummy("gamma", 3000));
@@ -103,8 +95,6 @@ public class TestHazelcastMapProducer extends CamelTestSupport implements Serial
 		
 		assertNotNull(b2);
 		assertEquals(1, b2.size());
-		
-		map.clear();
 	}
 	
 	@Override
