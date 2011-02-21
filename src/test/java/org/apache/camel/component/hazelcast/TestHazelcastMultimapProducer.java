@@ -26,10 +26,22 @@ import com.hazelcast.core.MultiMap;
 
 public class TestHazelcastMultimapProducer extends CamelTestSupport {
 
-	public void testPut() throws InterruptedException{
-		MultiMap<String, Object> map = Hazelcast.getMultiMap("bar");
-		map.clear();
+	private MultiMap<String, Object> map;
 
+	public void setUp() throws Exception{
+		super.setUp();
+		
+		this.map = Hazelcast.getMultiMap("bar");
+		this.map.clear();
+	}
+	
+	public void tearDown()throws Exception{
+		super.tearDown();
+		
+		this.map.clear();
+	}
+
+	public void testPut() throws InterruptedException{
 		template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
 		template.sendBodyAndHeader("direct:put", "my-bar", HazelcastConstants.OBJECT_ID, "4711");
 
@@ -38,14 +50,9 @@ public class TestHazelcastMultimapProducer extends CamelTestSupport {
 
 		assertTrue(values.contains("my-foo"));
 		assertTrue(values.contains("my-bar"));
-
-		map.clear();
 	}
 
 	public void testRemoveValue(){
-		MultiMap<String, Object> map = Hazelcast.getMultiMap("bar");
-		map.clear();
-
 		map.put("4711", "my-foo");
 		map.put("4711", "my-bar");
 
@@ -55,36 +62,24 @@ public class TestHazelcastMultimapProducer extends CamelTestSupport {
 
 		assertEquals(1, map.get("4711").size());
 		assertTrue(map.get("4711").contains("my-bar"));
-
-		map.clear();
 	}
 
 	@SuppressWarnings("unchecked")
 	public void testGet(){
-		MultiMap<String, Object> map = Hazelcast.getMultiMap("bar");
-		map.clear();
-
 		map.put("4711", "my-foo");
 
 		template.sendBodyAndHeader("direct:get", null, HazelcastConstants.OBJECT_ID, "4711");
 		Collection<Object> body = consumer.receiveBody("seda:out", 5000, Collection.class);
 
 		assertTrue(body.contains("my-foo"));
-
-		map.clear();
 	}
 
 	public void testDelete(){
-		MultiMap<String, Object> map = Hazelcast.getMultiMap("bar");
-		map.clear();
-
 		map.put("4711", "my-foo");
 		assertEquals(1, map.size());
 
 		template.sendBodyAndHeader("direct:delete", null, HazelcastConstants.OBJECT_ID, "4711");
 		assertEquals(0, map.size());
-
-		map.clear();
 	}
 
 	@Override
