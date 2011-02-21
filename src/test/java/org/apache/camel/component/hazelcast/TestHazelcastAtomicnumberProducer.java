@@ -49,8 +49,16 @@ public class TestHazelcastAtomicnumberProducer extends CamelTestSupport {
 		assertEquals(9, body);
 	}
 	
+	/*
+	 * does not work - I#ve dropped a message to the hazelcast list
+	 * for clarification (on 21.02.2011)
+	 */
 	public void testDestroy(){
-		fail();
+		Hazelcast.shutdownAll();
+		template.sendBody("direct:set", 10);
+		template.sendBody("direct:destroy", null);
+		
+		assertTrue(Hazelcast.getInstances().isEmpty());
 	}
 	
 	@Override
