@@ -30,43 +30,44 @@ import com.hazelcast.core.HazelcastInstance;
 public class TestHazelcastInstanceConsumer extends CamelTestSupport {
 
 	public void testAddInstance() throws InterruptedException{
-		
+
 		MockEndpoint added = getMockEndpoint("mock:added");
 		added.setExpectedMessageCount(2);
-		
+
 		Hazelcast.newHazelcastInstance(null);
 		Hazelcast.newHazelcastInstance(null);
-		
+
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
-		
+
 		//check headers
 		Exchange ex = added.getExchanges().get(0);
 		Map<String, Object> headers = ex.getIn().getHeaders();
-		
+
 		this.checkHeaders(headers, HazelcastConstants.ADDED);
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	public void testRemoveInstance() throws InterruptedException{
-		
+
 		MockEndpoint removed = getMockEndpoint("mock:removed");
 		removed.setExpectedMessageCount(1);
-		
+
 		HazelcastInstance h1 = Hazelcast.newHazelcastInstance(null);
-		
+
 		//TODO --> check how an instance can be killed...
 		h1.shutdown();
-		
+
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
-		
+
 		//check headers
 		Exchange ex = removed.getExchanges().get(0);
 		Map<String, Object> headers = ex.getIn().getHeaders();
-		
+
 		this.checkHeaders(headers, HazelcastConstants.REMOVED);
 	}
-	
-	
-	
+
+
+
 	@Override
 	protected RouteBuilder createRouteBuilder() throws Exception {
 		return new RouteBuilder() {
@@ -84,7 +85,7 @@ public class TestHazelcastInstanceConsumer extends CamelTestSupport {
 			}
 		};
 	}
-	
+
 	private void checkHeaders(Map<String, Object> headers, String action){
 		assertEquals(action, headers.get(HazelcastConstants.LISTENER_ACTION));
 		assertEquals(HazelcastConstants.INSTANCE_LISTENER, headers.get(HazelcastConstants.LISTENER_TYPE));

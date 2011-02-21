@@ -24,11 +24,10 @@ import org.apache.camel.component.hazelcast.HazelcastDefaultEndpoint;
 
 public class HazelcastInstanceEndpoint extends HazelcastDefaultEndpoint {
 
-	
 	public HazelcastInstanceEndpoint(String uri, HazelcastComponent component) {
-		super(uri, component);		
+		super(uri, component);
 	}
-	
+
 	public Consumer createConsumer(Processor processor) throws Exception {
 		return new HazelcastInstanceConsumer(this, processor);
 	}

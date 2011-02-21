@@ -33,51 +33,46 @@ public class HazelcastMultimapProducer extends DefaultProducer {
 
 	public HazelcastMultimapProducer(Endpoint endpoint, String cacheName) {
 		super(endpoint);
-		
+
 		this.cache = Hazelcast.getMultiMap(cacheName);
 	}
 
 	public void process(Exchange exchange) throws Exception {
-		
+
 		Map<String, Object> headers = exchange.getIn().getHeaders();
-		
+
 		//get header parameters
 		String oid 		= null;
 		int operation 	= -1;
-		
-		if(headers.containsKey(HazelcastConstants.OBJECT_ID)){
-			oid = (String) headers.get(HazelcastConstants.OBJECT_ID);
-		}
-		
+
 		if(headers.containsKey(HazelcastConstants.OPERATION)){
 			operation = (Integer) headers.get(HazelcastConstants.OPERATION);
 		}
-		
+
 		switch (operation) {
 		case HazelcastConstants.PUT_OPERATION:
 			this.put(oid, exchange);
 			break;
-			
+
 		case HazelcastConstants.GET_OPERATION:
 			this.get(oid, exchange);
 			break;
-			
+
 		case HazelcastConstants.DELETE_OPERATION:
 			this.delete(oid);
 			break;
-			
+
 		case HazelcastConstants.REMOVEVALUE_OPERATION:
 			this.removevalue(oid, exchange);
 			break;
-			
+
 		default:
 			throw new IllegalArgumentException(
 					String.format("The value '%s' is not allowed for parameter '%s' on the MULTIMAP cache.", operation, HazelcastConstants.OPERATION));
 		}
-		
+
 		//finally copy headers
 		HazelcastComponentHelper.copyHeaders(exchange);
-
 	}
 
 	private void put(String oid, Exchange exchange) {
@@ -92,7 +87,7 @@ public class HazelcastMultimapProducer extends DefaultProducer {
 	private void delete(String oid) {
 		this.cache.remove(oid);
 	}
-	
+
 	private void removevalue(String oid, Exchange exchange) {
 		this.cache.remove(oid, exchange.getIn().getBody());
 	}

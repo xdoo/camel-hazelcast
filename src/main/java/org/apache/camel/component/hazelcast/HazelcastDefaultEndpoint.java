@@ -25,13 +25,13 @@ import org.apache.camel.impl.DefaultEndpoint;
 public abstract class HazelcastDefaultEndpoint extends DefaultEndpoint {
 
 	protected String cacheName;
-	
+
 	public HazelcastDefaultEndpoint(String endpointUri, Component component, String cacheName) {
 		super(endpointUri, component);
-		
+
 		this.cacheName = cacheName;
 	}
-	
+
 	public HazelcastDefaultEndpoint(String endpointUri, Component component) {
 		super(endpointUri, component);
 	}

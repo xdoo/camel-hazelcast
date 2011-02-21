@@ -31,42 +31,42 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 	public void testAdd() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:added");
 		out.expectedMessageCount(1);
-		
+
 		IMap<String, Object> map = Hazelcast.getMap("foo");
 		map.put("4711", "my-foo");
-		
+
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
-		
+
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.ADDED);
 	}
-	
+
 	public void testEnvict(){
 		fail(); //TODO --> implement test
 	}
-	
+
 	public void testUpdate() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:updated");
 		out.expectedMessageCount(1);
-		
+
 		IMap<String, Object> map = Hazelcast.getMap("foo");
 		map.replace("4711", "my-fooo");
-		
+
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
-		
+
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.UPDATED);
 	}
-	
+
 	public void testRemove() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:removed");
 		out.expectedMessageCount(1);
-		
+
 		IMap<String, Object> map = Hazelcast.getMap("foo");
 		map.remove("4711");
-		
+
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.REMOVED);
 	}
-	
+
 	@Override
 	protected RouteBuilder createRouteBuilder() throws Exception {
 		return new RouteBuilder() {
@@ -89,11 +89,11 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
                 		.to("mock:removed")
                 	.otherwise()
                 		.log("fail!");
-                		
+
 			}
 		};
 	}
-	
+
 	private void checkHeaders(Map<String, Object> headers, String action){
 		assertEquals(action, headers.get(HazelcastConstants.LISTENER_ACTION));
 		assertEquals(HazelcastConstants.CACHE_LISTENER, headers.get(HazelcastConstants.LISTENER_TYPE));

@@ -16,6 +16,7 @@
  */
 package org.apache.camel.component.hazelcast;
 
+
 public class HazelcastConstants {
 
 	/*
@@ -25,8 +26,9 @@ public class HazelcastConstants {
 	public static final String MULTIMAP_PREFIX			= "multimap:";
 	public static final String ATOMICNUMBER_PREFIX		= "atomicvalue:";
 	public static final String INSTANCE_PREFIX			= "instance:";
-	
-	
+	public static final String QUEUE_PREFIX			    = "queue:";
+	public static final String SEDA_PREFIX              = "seda:";
+
 	/*
 	 * incoming header properties
 	 */
@@ -43,7 +45,7 @@ public class HazelcastConstants {
 	public static final String INSTANCE_PORT			= "hazelcast.instance.port";
 	public static final String CACHE_NAME				= "hazelcast.cache.name";
 	public static final String CACHE_TYPE				= "hazelcast.cache.type";
-	
+
 	//actions (put, delete, get, update)
 	public static final String OPERATION 				= "hazelcast.operation.type";
 	public static final int PUT_OPERATION 				= 1;
@@ -51,32 +53,43 @@ public class HazelcastConstants {
 	public static final int GET_OPERATION 				= 3;
 	public static final int UPDATE_OPERATION 			= 4;
 	public static final int QUERY_OPERATION 			= 5;
-	
+
 	//multimap
 	public static final int REMOVEVALUE_OPERATION 		= 10;
-	
+
 	//atomic numbers
 	public static final int INCREMENT_OPERATION			= 20;
 	public static final int DECREMENT_OPERATION			= 21;
 	public static final int SETVALUE_OPERATION			= 22;
 	public static final int DESTROY_OPERATION			= 23;
-	
+
+	//queue
+	public static final int ADD_OPERATION 			    = 31;
+	public static final int OFFER_OPERATION 	        = 32;
+	public static final int PEEK_OPERATION 	            = 33;
+	public static final int POLL_OPERATION 	            = 34;
+
 	/*
 	 * header values
 	 */
-	
+
 	//listener actions
 	public static final String REMOVED					= "removed";
 	public static final String ENVICTED					= "envicted";
 	public static final String UPDATED					= "updated";
 	public static final String ADDED					= "added";
-	
+
 	//storage types (map, queue, topic, multimap)
 	public static final String 	MAP 					= "map";
 	public static final String  MULTIMAP 				= "multimap";
 	public static final String  ATOMICNUMBER			= "atomicnumber";
-	
+	public static final String  QUEUE			        = "queue";
+
 	//listener types
 	public static final String CACHE_LISTENER			= "cachelistener";
 	public static final String INSTANCE_LISTENER		= "instancelistener";
+	public static final String ITEM_LISTENER		    = "itemlistener";
+
+
+
 }
