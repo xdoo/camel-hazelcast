@@ -73,10 +73,14 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 		out.expectedMessageCount(1);
 		
 		IMap<String, Object> map = Hazelcast.getMap("foo");
+		map.clear();
+		map.put("4711", "my-foo");
 		map.remove("4711");
 		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.REMOVED);
+		
+		map.clear();
 	}
 	
 	@Override
