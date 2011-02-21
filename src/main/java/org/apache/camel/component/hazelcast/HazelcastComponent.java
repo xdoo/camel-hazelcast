@@ -18,6 +18,7 @@ package org.apache.camel.component.hazelcast;
 
 import java.util.Map;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.component.hazelcast.HazelcastConstants;
 import org.apache.camel.component.hazelcast.atomicnumber.HazelcastAtomicnumberEndpoint;
@@ -25,11 +26,21 @@ import org.apache.camel.component.hazelcast.instance.HazelcastInstanceEndpoint;
 import org.apache.camel.component.hazelcast.map.HazelcastMapEndpoint;
 import org.apache.camel.component.hazelcast.multimap.HazelcastMultimapEndpoint;
 import org.apache.camel.component.hazelcast.queue.HazelcastQueueEndpoint;
+import org.apache.camel.component.hazelcast.seda.HazelcastSedaConfiguration;
+import org.apache.camel.component.hazelcast.seda.HazelcastSedaEndpoint;
 import org.apache.camel.impl.DefaultComponent;
 
 import static org.apache.camel.util.ObjectHelper.removeStartingCharacters;
 
 public class HazelcastComponent extends DefaultComponent {
+
+	public HazelcastComponent() {
+		super();
+	}
+
+	public HazelcastComponent(final CamelContext context) {
+		super(context);
+	}
 
 
 	@Override
@@ -71,8 +82,11 @@ public class HazelcastComponent extends DefaultComponent {
 		}
 
 		if(remaining.startsWith(HazelcastConstants.SEDA_PREFIX)){
-			//remaining = removeStartingCharacters(remaining.substring(HazelcastConstants.SEDA_PREFIX.length()), '/');
-			//endpoint = new HazelcastSedaEndpoint(uri,this,remaining);
+			final HazelcastSedaConfiguration config = new HazelcastSedaConfiguration();
+			setProperties(config, parameters);
+			config.setQueueName(remaining.substring(remaining.indexOf(":")+1,remaining.length()));
+
+			endpoint = new HazelcastSedaEndpoint(uri, this, config);
 		}
 
 		if(endpoint == null){
