@@ -32,30 +32,41 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 	public void testAdd() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:added");
 		out.expectedMessageCount(1);
-
+		
 		MultiMap<String, Object> map = Hazelcast.getMultiMap("mm");
 		map.put("4711", "my-foo");
-
+		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
-
+		
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.ADDED);
 	}
-
-	public void testEnvict(){
-		fail(); //TODO --> implement test
+	
+	public void testEnvict() throws InterruptedException{
+		
+		//prepare mock
+		MockEndpoint out = super.getMockEndpoint("mock:envicted");
+		out.expectedMessageCount(1);
+		
+		MultiMap<Object, Object> map = Hazelcast.getMultiMap("envict");
+		
+		map.clear();
+		map.put("4711", "my-foo-1");
+		
+		assertMockEndpointsSatisfied(15000, TimeUnit.MILLISECONDS);
+		
 	}
-
+	
 	public void testRemove() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:removed");
 		out.expectedMessageCount(1);
-
+		
 		MultiMap<String, Object> map = Hazelcast.getMultiMap("mm");
 		map.remove("4711");
-
+		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.REMOVED);
 	}
-
+	
 	@Override
 	protected RouteBuilder createRouteBuilder() throws Exception {
 		return new RouteBuilder() {
@@ -75,11 +86,26 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
                 		.to("mock:removed")
                 	.otherwise()
                 		.log("fail!");
-
+				
+				from(String.format("hazelcast:%senvict", HazelcastConstants.MULTIMAP_PREFIX))
+				.log("object...")
+				.choice()
+                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
+                		.log("...added")
+                		.to("mock:added")
+                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ENVICTED))
+                		.log("...envicted")
+                		.to("mock:envicted")
+                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED))
+                		.log("...removed")
+                		.to("mock:removed")
+                	.otherwise()
+                		.log("fail!");
+                		
 			}
 		};
 	}
-
+	
 	private void checkHeaders(Map<String, Object> headers, String action){
 		assertEquals(action, headers.get(HazelcastConstants.LISTENER_ACTION));
 		assertEquals(HazelcastConstants.CACHE_LISTENER, headers.get(HazelcastConstants.LISTENER_TYPE));
