@@ -61,10 +61,14 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 		out.expectedMessageCount(1);
 		
 		MultiMap<String, Object> map = Hazelcast.getMultiMap("mm");
+		map.clear();
+		map.put("4711", "foo");
 		map.remove("4711");
 		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.REMOVED);
+		
+		map.clear();
 	}
 	
 	@Override
