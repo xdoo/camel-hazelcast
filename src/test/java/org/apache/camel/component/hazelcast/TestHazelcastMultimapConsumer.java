@@ -28,12 +28,25 @@ import com.hazelcast.core.MultiMap;
 
 public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 
+	private MultiMap<String, Object> map;
+
+	public void setUp() throws Exception{
+		super.setUp();
+		
+		this.map = Hazelcast.getMultiMap("mm");
+		this.map.clear();
+	}
+	
+	public void tearDown()throws Exception{
+		super.tearDown();
+		
+		this.map.clear();
+	}
 
 	public void testAdd() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:added");
 		out.expectedMessageCount(1);
 		
-		MultiMap<String, Object> map = Hazelcast.getMultiMap("mm");
 		map.put("4711", "my-foo");
 		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
@@ -48,9 +61,6 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 		MockEndpoint out = super.getMockEndpoint("mock:envicted");
 		out.expectedMessageCount(1);
 		
-		MultiMap<Object, Object> map = Hazelcast.getMultiMap("mm");
-		
-		map.clear();
 		map.put("1", "my-foo-1");
 		map.put("2", "my-foo-2");
 		map.put("3", "my-foo-3");
@@ -60,23 +70,18 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 		
 		assertMockEndpointsSatisfied(30000, TimeUnit.MILLISECONDS);
 		
-		map.clear();
-		
 	}
 	
 	public void testRemove() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:removed");
 		out.expectedMessageCount(1);
 		
-		MultiMap<String, Object> map = Hazelcast.getMultiMap("mm");
-		map.clear();
 		map.put("4711", "foo");
 		map.remove("4711");
 		
 		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.REMOVED);
 		
-		map.clear();
 	}
 	
 	@Override
