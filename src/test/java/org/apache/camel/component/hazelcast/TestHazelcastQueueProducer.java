@@ -20,7 +20,8 @@ import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.test.CamelTestSupport;
+import org.apache.camel.test.junit4.CamelTestSupport;
+import org.junit.Test;
 
 import com.hazelcast.core.Hazelcast;
 
@@ -31,8 +32,8 @@ import com.hazelcast.core.Hazelcast;
  */
 public class TestHazelcastQueueProducer extends CamelTestSupport {
 
-
-	public void testPut() throws InterruptedException{
+	@Test
+	public void put() throws InterruptedException{
 		Queue<Object> queue = Hazelcast.getQueue("bar");
 		queue.clear();
 
@@ -43,7 +44,8 @@ public class TestHazelcastQueueProducer extends CamelTestSupport {
 		queue.clear();
 	}
 
-	public void testAdd() throws InterruptedException{
+	@Test
+	public void add() throws InterruptedException{
 		Queue<Object> queue = Hazelcast.getQueue("bar");
 		queue.clear();
 
@@ -54,7 +56,8 @@ public class TestHazelcastQueueProducer extends CamelTestSupport {
 		queue.clear();
 	}
 
-	public void testOffer() throws InterruptedException{
+	@Test
+	public void offer() throws InterruptedException{
 		Queue<Object> queue = Hazelcast.getQueue("bar");
 		queue.clear();
 
@@ -64,7 +67,8 @@ public class TestHazelcastQueueProducer extends CamelTestSupport {
 		queue.clear();
 	}
 
-	public void testRemoveValue() throws InterruptedException{
+	@Test
+	public void removeValue() throws InterruptedException{
 		BlockingQueue<String> queue = Hazelcast.getQueue("bar");
 		queue.clear();
 
@@ -88,8 +92,8 @@ public class TestHazelcastQueueProducer extends CamelTestSupport {
 		queue.clear();
 	}
 
-
-	public void testPoll() throws InterruptedException{
+	@Test
+	public void poll() throws InterruptedException{
 		BlockingQueue<String> queue = Hazelcast.getQueue("bar");
 		queue.clear();
 
@@ -104,7 +108,8 @@ public class TestHazelcastQueueProducer extends CamelTestSupport {
 		queue.clear();
 	}
 
-	public void testPeek() throws InterruptedException{
+	@Test
+	public void peek() throws InterruptedException{
 		BlockingQueue<String> queue = Hazelcast.getQueue("bar");
 		queue.clear();
 
@@ -118,7 +123,6 @@ public class TestHazelcastQueueProducer extends CamelTestSupport {
 
 		queue.clear();
 	}
-
 
 
 	@Override

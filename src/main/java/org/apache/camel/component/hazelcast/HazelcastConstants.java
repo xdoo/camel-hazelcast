@@ -28,11 +28,13 @@ public class HazelcastConstants {
 	public static final String INSTANCE_PREFIX			= "instance:";
 	public static final String QUEUE_PREFIX			    = "queue:";
 	public static final String SEDA_PREFIX              = "seda:";
+	public static final String LIST_PREFIX				= "list:";
 
 	/*
 	 * incoming header properties
 	 */
 	public static final String OBJECT_ID				= "hazelcast.objectId";
+	public static final String OBJECT_POS				= "hazelcast.objectIndex";
 	public static final String QUERY					= "hazelcast.query";
 
 	/*

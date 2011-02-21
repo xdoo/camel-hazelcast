@@ -23,6 +23,7 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.component.hazelcast.HazelcastConstants;
 import org.apache.camel.component.hazelcast.atomicnumber.HazelcastAtomicnumberEndpoint;
 import org.apache.camel.component.hazelcast.instance.HazelcastInstanceEndpoint;
+import org.apache.camel.component.hazelcast.list.HazelcastListEndpoint;
 import org.apache.camel.component.hazelcast.map.HazelcastMapEndpoint;
 import org.apache.camel.component.hazelcast.multimap.HazelcastMultimapEndpoint;
 import org.apache.camel.component.hazelcast.queue.HazelcastQueueEndpoint;
@@ -41,7 +42,6 @@ public class HazelcastComponent extends DefaultComponent {
 	public HazelcastComponent(final CamelContext context) {
 		super(context);
 	}
-
 
 	@Override
 	protected Endpoint createEndpoint(String uri, String remaining,
@@ -87,6 +87,12 @@ public class HazelcastComponent extends DefaultComponent {
 			config.setQueueName(remaining.substring(remaining.indexOf(":")+1,remaining.length()));
 
 			endpoint = new HazelcastSedaEndpoint(uri, this, config);
+		}
+
+		if(remaining.startsWith(HazelcastConstants.LIST_PREFIX)){
+			//remaining is anything (name it foo ;)
+			remaining = removeStartingCharacters(remaining.substring(HazelcastConstants.LIST_PREFIX.length()), '/');
+			endpoint = new HazelcastListEndpoint(uri,this,remaining);
 		}
 
 		if(endpoint == null){
