@@ -34,7 +34,7 @@ public class HazelcastInstanceEndpoint extends HazelcastDefaultEndpoint {
 
 	public Producer createProducer() throws Exception {
 		throw new UnsupportedOperationException(
-				"You cannot send messages to this endpoint:" + getEndpointUri());
+				"You cannot send messages to this endpoint: " + getEndpointUri());
 
 	}
 
