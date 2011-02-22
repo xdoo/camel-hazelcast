@@ -30,7 +30,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author ipolyzos
  */
 //@Ignore("Tests should run manually.")
-public class TestHazelcastSpringSupport extends CamelSpringTestSupport {
+public class TestHazelcastSedaSpringSupport extends CamelSpringTestSupport {
 
 	@EndpointInject(uri = "mock:result")
 	private MockEndpoint mock;
@@ -46,6 +46,6 @@ public class TestHazelcastSpringSupport extends CamelSpringTestSupport {
 
 	@Override
 	protected ClassPathXmlApplicationContext createApplicationContext() {
-		return new ClassPathXmlApplicationContext("org/apache/camel/component/hzlq/test/seda-test-route.xml");
+		return new ClassPathXmlApplicationContext("META-INF/spring/test-camel-context-seda.xml");
 	}
 }
