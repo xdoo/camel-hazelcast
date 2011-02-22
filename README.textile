@@ -169,6 +169,7 @@ bc. from("direct:put")
 .to(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX));
 
 Spring DSL:
+
 bc. <route>
 	<from uri="direct:put" />
 	<log message="put.."/>
