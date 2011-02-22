@@ -97,12 +97,14 @@ public class HazelcastComponent extends DefaultComponent {
 
 		if(endpoint == null){
 			throw new IllegalArgumentException(
-					String.format("Your URI does not provide a correct 'type' prefix. It should be something like 'hazelcast:[%s|%s|%s|%s|%s]name' but is '%s'.",
+					String.format("Your URI does not provide a correct 'type' prefix. It should be anything like 'hazelcast:[%s|%s|%s|%s|%s|%s|%s]name' but is '%s'.",
 							HazelcastConstants.MAP_PREFIX,
 							HazelcastConstants.MULTIMAP_PREFIX,
 							HazelcastConstants.ATOMICNUMBER_PREFIX,
 							HazelcastConstants.INSTANCE_PREFIX,
 							HazelcastConstants.QUEUE_PREFIX,
+							HazelcastConstants.SEDA_PREFIX,
+							HazelcastConstants.LIST_PREFIX,
 							uri));
 		}
 

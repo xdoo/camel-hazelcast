@@ -30,7 +30,7 @@ public class HazelcastAtomicnumberEndpoint extends HazelcastDefaultEndpoint {
 
 	public Consumer createConsumer(Processor processor) throws Exception {
 		throw new UnsupportedOperationException(
-				"You cannot send messages to this endpoint:" + getEndpointUri());
+				"You cannot send messages to this endpoint: " + getEndpointUri());
 	}
 
 	public Producer createProducer() throws Exception {
