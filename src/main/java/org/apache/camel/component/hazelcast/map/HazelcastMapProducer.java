@@ -31,11 +31,13 @@ import com.hazelcast.query.SqlPredicate;
 public class HazelcastMapProducer extends DefaultProducer {
 
 	private IMap<String, Object> cache;
+	private HazelcastComponentHelper helper;
 
 	public HazelcastMapProducer(HazelcastMapEndpoint endpoint, String cacheName) {
 		super(endpoint);
 
 		this.cache = Hazelcast.getMap(cacheName);
+		this.helper = new HazelcastComponentHelper();
 	}
 
 	public void process(Exchange exchange) throws Exception {
@@ -52,7 +54,13 @@ public class HazelcastMapProducer extends DefaultProducer {
 		}
 
 		if(headers.containsKey(HazelcastConstants.OPERATION)){
-			operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+
+			//producer allows int (HazelcastConstants) and string values
+			if(headers.get(HazelcastConstants.OPERATION) instanceof String){
+				operation = this.helper.lookupOperationNumber((String) headers.get(HazelcastConstants.OPERATION));
+			} else {
+				operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+			}
 		}
 
 		if(headers.containsKey(HazelcastConstants.QUERY)){
