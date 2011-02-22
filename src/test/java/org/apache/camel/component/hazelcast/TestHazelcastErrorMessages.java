@@ -55,7 +55,7 @@ public class TestHazelcastErrorMessages extends CamelTestSupport {
 		try {
 			context.addRoutes(builder);
 		} catch (Exception e) {
-			assertTrue(e.getMessage().contains("You cannot consume messages from this endpoint: hazelcast://atomicvalue:foo"));
+			assertTrue(e.getMessage().contains("You cannot send messages to this endpoint: hazelcast://atomicvalue:foo"));
 		}
 	}
 	

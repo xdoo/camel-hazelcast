@@ -44,8 +44,12 @@ public class HazelcastMultimapProducer extends DefaultProducer {
 		Map<String, Object> headers = exchange.getIn().getHeaders();
 
 		//get header parameters
-		String oid 		= null;
+		String oid 	= null;
 		int operation 	= -1;
+
+		if(headers.containsKey(HazelcastConstants.OBJECT_ID)){
+			oid = (String) headers.get(HazelcastConstants.OBJECT_ID);
+		}
 
 		if(headers.containsKey(HazelcastConstants.OPERATION)){
 			if(headers.get(HazelcastConstants.OPERATION) instanceof String){
