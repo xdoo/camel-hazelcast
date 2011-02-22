@@ -44,6 +44,8 @@ public class TestHazelcastInstanceConsumer extends CamelTestSupport {
 		Map<String, Object> headers = ex.getIn().getHeaders();
 
 		this.checkHeaders(headers, HazelcastConstants.ADDED);
+
+		Hazelcast.shutdownAll();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -64,6 +66,8 @@ public class TestHazelcastInstanceConsumer extends CamelTestSupport {
 		Map<String, Object> headers = ex.getIn().getHeaders();
 
 		this.checkHeaders(headers, HazelcastConstants.REMOVED);
+
+		Hazelcast.shutdownAll();
 	}
 
 
