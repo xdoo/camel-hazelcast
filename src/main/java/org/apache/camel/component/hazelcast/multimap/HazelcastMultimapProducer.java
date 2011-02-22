@@ -30,11 +30,13 @@ import com.hazelcast.core.MultiMap;
 public class HazelcastMultimapProducer extends DefaultProducer {
 
 	private MultiMap<Object, Object> cache;
+	private HazelcastComponentHelper helper;
 
 	public HazelcastMultimapProducer(Endpoint endpoint, String cacheName) {
 		super(endpoint);
 
 		this.cache = Hazelcast.getMultiMap(cacheName);
+		this.helper = new HazelcastComponentHelper();
 	}
 
 	public void process(Exchange exchange) throws Exception {
@@ -46,7 +48,11 @@ public class HazelcastMultimapProducer extends DefaultProducer {
 		int operation 	= -1;
 
 		if(headers.containsKey(HazelcastConstants.OPERATION)){
-			operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+			if(headers.get(HazelcastConstants.OPERATION) instanceof String){
+				operation = this.helper.lookupOperationNumber((String) headers.get(HazelcastConstants.OPERATION));
+			} else {
+				operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+			}
 		}
 
 		switch (operation) {

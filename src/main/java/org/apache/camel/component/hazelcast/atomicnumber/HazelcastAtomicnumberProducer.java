@@ -30,11 +30,13 @@ import com.hazelcast.core.Hazelcast;
 public class HazelcastAtomicnumberProducer extends DefaultProducer {
 
 	private AtomicNumber atomicnumber;
+	private HazelcastComponentHelper helper;
 
 	public HazelcastAtomicnumberProducer(Endpoint endpoint, String cacheName) {
 		super(endpoint);
 		
 		this.atomicnumber = Hazelcast.getAtomicNumber(cacheName);
+		this.helper = new HazelcastComponentHelper();
 	}
 
 	public void process(Exchange exchange) throws Exception {
@@ -45,7 +47,11 @@ public class HazelcastAtomicnumberProducer extends DefaultProducer {
 		int operation 	= -1;
 		
 		if(headers.containsKey(HazelcastConstants.OPERATION)){
-			operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+			if(headers.get(HazelcastConstants.OPERATION) instanceof String){
+				operation = this.helper.lookupOperationNumber((String) headers.get(HazelcastConstants.OPERATION));
+			} else {
+				operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+			}
 		}
 		
 		switch (operation) {
