@@ -37,6 +37,7 @@ import com.hazelcast.core.IList;
 public class HazelcastListProducer extends DefaultProducer {
 
 	private IList<Object> list;
+	private HazelcastComponentHelper helper;
 
 	public HazelcastListProducer(Endpoint endpoint, String listName) {
 		super(endpoint);
@@ -59,7 +60,11 @@ public class HazelcastListProducer extends DefaultProducer {
 		}
 
 		if (headers.containsKey(HazelcastConstants.OPERATION)) {
-			operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+			if(headers.get(HazelcastConstants.OPERATION) instanceof String){
+				operation = this.helper.lookupOperationNumber((String) headers.get(HazelcastConstants.OPERATION));
+			} else {
+				operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+			}
 		}
 
 		switch (operation) {

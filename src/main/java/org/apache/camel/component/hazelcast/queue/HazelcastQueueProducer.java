@@ -35,6 +35,7 @@ import com.hazelcast.core.IQueue;
 public class HazelcastQueueProducer extends DefaultProducer {
 
 	private IQueue<Object> queue;
+	private HazelcastComponentHelper helper;
 
 	public HazelcastQueueProducer(Endpoint endpoint, String queueName) {
 		super(endpoint);
@@ -49,7 +50,11 @@ public class HazelcastQueueProducer extends DefaultProducer {
 		int operation = -1;
 
 		if (headers.containsKey(HazelcastConstants.OPERATION)) {
-			operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+			if(headers.get(HazelcastConstants.OPERATION) instanceof String){
+				operation = this.helper.lookupOperationNumber((String) headers.get(HazelcastConstants.OPERATION));
+			} else {
+				operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+			}
 		}
 
 		switch (operation) {
