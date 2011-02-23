@@ -6,7 +6,7 @@ h3. general usage
 
 A camel-hazelcast URI looks always like:
 
-bc. hazelcast:[map|multimap|atomicvalue|instance]:cachename
+bc. hazelcast:[map|multimap|list|queue|seda|atomicvalue|instance]:cachename
 
 An URI without the second prefix is not valid. All additional things like a id for a stored object are provided over header variables.
 
@@ -314,10 +314,17 @@ The queue consumer provides 2 operations (add, remove).
 
 Sample :
 
-bc. from(String.format("hazelcast:%smm", HazelcastConstants.QUEUE_PREFIX)).log("object...").choice().when(
-						header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED)).log("...added").to("mock:added")
-						.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED)).log("...removed").to(
-								"mock:removed").otherwise().log("fail!");
+bc. from(String.format("hazelcast:%smm", HazelcastConstants.QUEUE_PREFIX))
+		   .log("object...")
+			 .choice()
+				.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
+					.log("...added")
+					.to("mock:added")
+				.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED))
+					.log("...removed")
+					.to("mock:removed")
+				.otherwise()
+					.log("fail!");
 
 h3. List producer – to(“hazelcast:list:foo”)
 
@@ -350,7 +357,7 @@ bc. from("direct:removevalue")
 					.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.REMOVEVALUE_OPERATION))
 					.to(String.format("hazelcast:%sbar", HazelcastConstants.LIST_PREFIX));
 
-Please note that set,get and removevalue and not yet supported for lists.
+Please note that set,get and removevalue and not yet supported by hazelcast, will be added in the future..
 
 
 h3. List consumer – from(“hazelcast:list:foo”)
