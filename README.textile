@@ -371,7 +371,7 @@ bc. from(String.format("hazelcast:%smm", HazelcastConstants.LIST_PREFIX))
 
 h3. SEDA Componenent
 
-SEDA component differs than the rest provided. It implements aw ork-queue in order to  support asynchronous SEDA architectures, similar to the core "SEDA" component.
+SEDA component differs from the rest components provided. It implements a work-queue in order to  support asynchronous SEDA architectures, similar to the core "SEDA" component.
 
 h4. SEDA producer – to(“hazelcast:seda:foo”)
 
