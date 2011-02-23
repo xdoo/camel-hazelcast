@@ -25,7 +25,7 @@ Sample for *put*:
 Java DSL:
 
 bc. from("direct:put")
-.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION))	
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION))
 .to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
 
 Spring DSL:
@@ -43,7 +43,7 @@ Sample for *get*:
 Java DSL:
 
 bc. from("direct:get")
-.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION))	
+.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION))
 .to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
 .to("seda:out");
 
@@ -158,7 +158,7 @@ bc. from(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
 
 h3. multimap cache producer - to("hazelcast:multimap:foo")
 
-A multimap is a cache where you can store n values to one key. The multimap producer provides 4 operations (put, get, removevalue, delete). 
+A multimap is a cache where you can store n values to one key. The multimap producer provides 4 operations (put, get, removevalue, delete).
 
 Sample for *put*:
 
@@ -227,7 +227,7 @@ Java DSL:
 
 bc. from("direct:delete")
 .setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.DELETE_OPERATION))
-.to(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX)); 
+.to(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX));
 
 Spring DSL:
 
@@ -246,7 +246,7 @@ bc. template.sendBodyAndHeader("direct:[put|get|removevalue|delete]", "my-foo", 
 
 h3. multimap cache consumer - from("hazelcast:multimap:foo")
 
-For the multimap cache this component provides the same listeners / variables as for the map cache consumer (except the update and enviction listener). The only difference is the *multimap* prefix inside the URI. Here is a sample: 
+For the multimap cache this component provides the same listeners / variables as for the map cache consumer (except the update and enviction listener). The only difference is the *multimap* prefix inside the URI. Here is a sample:
 
 bc. from(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX))
 .log("object...")
@@ -264,6 +264,148 @@ bc. from(String.format("hazelcast:%sbar", HazelcastConstants.MULTIMAP_PREFIX))
                 .log("fail!");
 
 Enviction will be added as feature, soon (this is a Hazelcast issue).
+
+h3. Queue producer – to(“hazelcast:queue:foo”)
+
+The queue producer provides 6 operations (add, put, poll, peek, offer, removevalue).
+
+Sample for *add*:
+
+bc. from("direct:add")
+				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.ADD_OPERATION))
+				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+
+Sample for *put*:
+
+bc. from("direct:put")
+				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION))
+				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+
+Sample for *poll*:
+
+bc. from("direct:poll")
+				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.POLL_OPERATION))
+				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+
+Sample for *peek*:
+
+bc. from("direct:peek")
+				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PEEK_OPERATION))
+				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+
+
+Sample for *offer*:
+
+bc. from("direct:offer")
+				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.OFFER_OPERATION))
+				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+
+
+Sample for *removevalue*:
+
+bc. from("direct:removevalue")
+				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.REMOVEVALUE_OPERATION))
+				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+
+
+h3. Queue consumer – from(“hazelcast:queue:foo”)
+
+The queue consumer provides 2 operations (add, remove).
+
+Sample :
+
+bc. from(String.format("hazelcast:%smm", HazelcastConstants.QUEUE_PREFIX)).log("object...").choice().when(
+						header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED)).log("...added").to("mock:added")
+						.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED)).log("...removed").to(
+								"mock:removed").otherwise().log("fail!");
+
+h3. List producer – to(“hazelcast:list:foo”)
+
+The list producer provides 4 operations (add, set, get, removevalue).
+
+Sample for *add*:
+
+bc. from("direct:add")
+					.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.ADD_OPERATION))
+					.to(String.format("hazelcast:%sbar", HazelcastConstants.LIST_PREFIX));
+
+
+Sample for *get*:
+
+bc. from("direct:get")
+					.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION))
+					.to(String.format("hazelcast:%sbar", HazelcastConstants.LIST_PREFIX))
+					.to("seda:out");
+
+Sample for *setvalue*:
+
+bc. from("direct:set")
+					.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.SETVALUE_OPERATION))
+					.to(String.format("hazelcast:%sbar", HazelcastConstants.LIST_PREFIX));
+
+
+Sample for *removevalue*:
+
+bc. from("direct:removevalue")
+					.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.REMOVEVALUE_OPERATION))
+					.to(String.format("hazelcast:%sbar", HazelcastConstants.LIST_PREFIX));
+
+Please note that set,get and removevalue and not yet supported for lists.
+
+
+h3. List consumer – from(“hazelcast:list:foo”)
+
+The list consumer provides 2 operations (add, remove).
+
+Sample :
+
+bc. from(String.format("hazelcast:%smm", HazelcastConstants.LIST_PREFIX))
+					.log("object...")
+					.choice()
+						.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
+							.log("...added").to("mock:added")
+						.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.REMOVED))
+							.log("...removed").to("mock:removed").otherwise().log("fail!");
+
+
+
+h3. SEDA Componenent
+
+SEDA component differs than the rest provided. It implements aw ork-queue in order to  support asynchronous SEDA architectures, similar to the core "SEDA" component.
+
+h4. SEDA producer – to(“hazelcast:seda:foo”)
+
+The SEDA producer provides no operations. You only send data to the specified queue.
+
+Java DSL :
+
+bc. from("direct:foo")
+					.to("hazelcast:seda:foo");
+
+Spring DSL :
+
+bc.  <route>
+      	<from uri="direct:start" />
+      	<to uri="hazelcast:seda:foo" />
+    </route
+
+
+h4. SEDA consumer – from(“hazelcast:seda:foo”)
+
+The SEDA consumer provides no operations. You only retrieve data from the specified queue.
+
+Java DSL :
+
+bc. from("hazelcast:seda:foo")
+					.to("mock:result");
+
+Spring DSL:
+
+bc. <route>
+   		  <from uri="hazelcast:seda:foo" />
+   		  <to uri="mock:result" />
+    </route>
+
 
 h3. atomic number producer - to("hazelcast:atomicnumber:foo")
 
@@ -315,7 +457,7 @@ Java DSL:
 
 bc. from("direct:increment")
 .setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.INCREMENT_OPERATION))
-.to(String.format("hazelcast:%sfoo", HazelcastConstants.ATOMICNUMBER_PREFIX)); 
+.to(String.format("hazelcast:%sfoo", HazelcastConstants.ATOMICNUMBER_PREFIX));
 
 Spring DSL:
 
@@ -369,7 +511,7 @@ bc. <route>
 
 h3. instance consumer - from("hazelcast:instance:foo")
 
-Hazelcast makes sense in one single "server node", but it's extremly powerful in a clustered environment. The instance consumer fires if a new cache instance will join or leave the cluster. 
+Hazelcast makes sense in one single "server node", but it's extremly powerful in a clustered environment. The instance consumer fires if a new cache instance will join or leave the cluster.
 
 Here's a sample:
 
@@ -392,4 +534,4 @@ Each event provides the following information inside the message header:
 |*hazelcast.instance.host*|host name of the instance|
 |*hazelcast.instance.port*|port number of the instance|
 
-If you have further questions don't hesitate to send a mail to @info(at)catify.com@, or post to the camel mailinglist (preferred way ;) 
+If you have further questions don't hesitate to send a mail to @info(at)catify.com@, or post to the camel mailinglist (preferred way ;)
