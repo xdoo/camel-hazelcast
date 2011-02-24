@@ -19,7 +19,8 @@ package org.apache.camel.component.hazelcast;
 import java.util.Collection;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.test.CamelTestSupport;
+import org.apache.camel.test.junit4.CamelTestSupport;
+import org.junit.Test;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.MultiMap;
@@ -28,19 +29,22 @@ public class TestHazelcastMultimapProducer extends CamelTestSupport {
 
 	private MultiMap<String, Object> map;
 
+	@Override
 	public void setUp() throws Exception{
 		super.setUp();
 		
 		this.map = Hazelcast.getMultiMap("bar");
 		this.map.clear();
 	}
-	
+
+	@Override	
 	public void tearDown()throws Exception{
 		super.tearDown();
 		
 		this.map.clear();
 	}
 
+	@Test
 	public void testPut() throws InterruptedException{
 		template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
 		template.sendBodyAndHeader("direct:put", "my-bar", HazelcastConstants.OBJECT_ID, "4711");
@@ -52,6 +56,7 @@ public class TestHazelcastMultimapProducer extends CamelTestSupport {
 		assertTrue(values.contains("my-bar"));
 	}
 
+	@Test
 	public void testRemoveValue(){
 		map.put("4711", "my-foo");
 		map.put("4711", "my-bar");
@@ -64,6 +69,7 @@ public class TestHazelcastMultimapProducer extends CamelTestSupport {
 		assertTrue(map.get("4711").contains("my-bar"));
 	}
 
+	@Test
 	@SuppressWarnings("unchecked")
 	public void testGet(){
 		map.put("4711", "my-foo");
@@ -74,6 +80,7 @@ public class TestHazelcastMultimapProducer extends CamelTestSupport {
 		assertTrue(body.contains("my-foo"));
 	}
 
+	@Test
 	public void testDelete(){
 		map.put("4711", "my-foo");
 		assertEquals(1, map.size());

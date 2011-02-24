@@ -1,6 +1,7 @@
 package org.apache.camel.component.hazelcast;
 
-import org.apache.camel.test.CamelSpringTestSupport;
+import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -21,7 +22,8 @@ public class TestHazelcastAtomicnumberProducerForSpring extends
 	protected AbstractApplicationContext createApplicationContext() {
 		return  new ClassPathXmlApplicationContext("/META-INF/spring/test-camel-context-atomicnumber.xml");
 	}
-	
+
+	@Test	
 	public void testSet(){
 		template.sendBody("direct:set", 4711);
 		
@@ -29,20 +31,23 @@ public class TestHazelcastAtomicnumberProducerForSpring extends
 		assertEquals(4711, body);
 	}
 	
+	@Test
 	public void testGet(){		
 		template.sendBody("direct:set", 1234);
 		
 		long body = template.requestBody("direct:get", null, Long.class);
 		assertEquals(1234, body);
 	}
-	
+
+	@Test	
 	public void testIncrement(){
 		template.sendBody("direct:set", 10);
 		
 		long body = template.requestBody("direct:increment", null, Long.class);
 		assertEquals(11, body);
 	}
-	
+
+	@Test	
 	public void testDecrement(){
 		template.sendBody("direct:set", 10);
 		
@@ -63,6 +68,7 @@ public class TestHazelcastAtomicnumberProducerForSpring extends
 	 * set test to true by default. 
 	 * TODO: if we'll get the new hazelcast version I'll fix the test.
 	 */
+	@Test
 	public void testDestroy(){
 		template.sendBody("direct:set", 10);
 		template.sendBody("direct:destroy", null);

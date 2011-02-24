@@ -22,13 +22,15 @@ import java.util.concurrent.TimeUnit;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.CamelTestSupport;
+import org.apache.camel.test.junit4.CamelTestSupport;
+import org.junit.Test;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
 public class TestHazelcastInstanceConsumer extends CamelTestSupport {
 
+	@Test
 	public void testAddInstance() throws InterruptedException{
 
 		MockEndpoint added = getMockEndpoint("mock:added");
@@ -48,6 +50,7 @@ public class TestHazelcastInstanceConsumer extends CamelTestSupport {
 		Hazelcast.shutdownAll();
 	}
 
+	@Test
 	@SuppressWarnings("deprecation")
 	public void testRemoveInstance() throws InterruptedException{
 
@@ -69,8 +72,6 @@ public class TestHazelcastInstanceConsumer extends CamelTestSupport {
 
 		Hazelcast.shutdownAll();
 	}
-
-
 
 	@Override
 	protected RouteBuilder createRouteBuilder() throws Exception {

@@ -3,7 +3,8 @@ package org.apache.camel.component.hazelcast;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.apache.camel.test.CamelSpringTestSupport;
+import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -33,14 +34,16 @@ public class TestHazelcastMapProducerForSpring extends CamelSpringTestSupport im
 	protected AbstractApplicationContext createApplicationContext() {
 		return  new ClassPathXmlApplicationContext("/META-INF/spring/test-camel-context-map.xml");
 	}
-	
+
+	@Test	
 	public void testPut() throws InterruptedException{
 		template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
 		
 		assertTrue(map.containsKey("4711"));
 		assertEquals("my-foo", map.get("4711"));
 	}
-	
+
+	@Test	
 	public void testUpdate(){
 		template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
 		
@@ -50,7 +53,8 @@ public class TestHazelcastMapProducerForSpring extends CamelSpringTestSupport im
 		template.sendBodyAndHeader("direct:update", "my-fooo", HazelcastConstants.OBJECT_ID, "4711");
 		assertEquals("my-fooo", map.get("4711"));
 	}
-	
+
+	@Test	
 	public void testGet(){
 		map.put("4711", "my-foo");
 		
@@ -59,7 +63,8 @@ public class TestHazelcastMapProducerForSpring extends CamelSpringTestSupport im
 		
 		assertEquals("my-foo", body);
 	}
-	
+
+	@Test	
 	public void testDelete(){
 		map.put("4711", "my-foo");
 		assertEquals(1, map.size());
@@ -67,7 +72,8 @@ public class TestHazelcastMapProducerForSpring extends CamelSpringTestSupport im
 		template.sendBodyAndHeader("direct:delete", null, HazelcastConstants.OBJECT_ID, "4711");
 		assertEquals(0, map.size());
 	}
-	
+
+	@Test	
 	public void testQuery(){		
 		map.put("1", new Dummy("alpha", 1000));
 		map.put("2", new Dummy("beta", 2000));

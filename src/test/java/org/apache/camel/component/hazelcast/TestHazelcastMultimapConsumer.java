@@ -21,7 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.CamelTestSupport;
+import org.apache.camel.test.junit4.CamelTestSupport;
+import org.junit.Test;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.MultiMap;
@@ -30,6 +31,7 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 
 	private MultiMap<String, Object> map;
 
+	@Override
 	public void setUp() throws Exception{
 		super.setUp();
 
@@ -37,12 +39,14 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 		this.map.clear();
 	}
 
+	@Override
 	public void tearDown()throws Exception{
 		super.tearDown();
 
 		this.map.clear();
 	}
 
+	@Test
 	public void testAdd() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:added");
 		out.expectedMessageCount(1);
@@ -60,6 +64,7 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 	 *
 	 * we leave the test in our code an set the result to asserted by default.
 	 */
+	@Test
 	public void testEnvict() throws InterruptedException{
 		MockEndpoint out = super.getMockEndpoint("mock:envicted");
 		out.expectedMessageCount(1);
@@ -77,6 +82,7 @@ public class TestHazelcastMultimapConsumer extends CamelTestSupport {
 
 	}
 
+	@Test
 	public void testRemove() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:removed");
 		out.expectedMessageCount(1);

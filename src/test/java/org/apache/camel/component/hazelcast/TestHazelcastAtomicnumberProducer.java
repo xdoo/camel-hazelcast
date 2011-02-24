@@ -17,10 +17,22 @@
 package org.apache.camel.component.hazelcast;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.test.CamelTestSupport;
+import org.apache.camel.test.junit4.CamelTestSupport;
+import org.junit.Test;
 
 public class TestHazelcastAtomicnumberProducer extends CamelTestSupport {
 	
+	@Override
+	public void setUp() throws Exception{
+		super.setUp();
+	}
+	
+	@Override
+	public void tearDown()throws Exception{
+		super.tearDown();
+	}
+
+	@Test
 	public void testSet(){
 		template.sendBody("direct:set", 4711);
 		
@@ -28,6 +40,7 @@ public class TestHazelcastAtomicnumberProducer extends CamelTestSupport {
 		assertEquals(4711, body);
 	}
 	
+	@Test
 	public void testGet(){		
 		template.sendBody("direct:set", 1234);
 		
@@ -35,13 +48,15 @@ public class TestHazelcastAtomicnumberProducer extends CamelTestSupport {
 		assertEquals(1234, body);
 	}
 	
+	@Test
 	public void testIncrement(){
 		template.sendBody("direct:set", 10);
 		
 		long body = template.requestBody("direct:increment", null, Long.class);
 		assertEquals(11, body);
 	}
-	
+
+	@Test	
 	public void testDecrement(){
 		template.sendBody("direct:set", 10);
 		
@@ -62,6 +77,7 @@ public class TestHazelcastAtomicnumberProducer extends CamelTestSupport {
 	 * set test to true by default. 
 	 * TODO: if we'll get the new hazelcast version I'll fix the test.
 	 */
+	@Test
 	public void testDestroy(){
 		template.sendBody("direct:set", 10);
 		template.sendBody("direct:destroy", null);

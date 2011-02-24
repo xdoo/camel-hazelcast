@@ -2,7 +2,8 @@ package org.apache.camel.component.hazelcast;
 
 import java.util.Collection;
 
-import org.apache.camel.test.CamelSpringTestSupport;
+import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -33,7 +34,8 @@ public class TestHazelcastMultimapProducerForSpring extends
 	protected AbstractApplicationContext createApplicationContext() {
 		return  new ClassPathXmlApplicationContext("/META-INF/spring/test-camel-context-multimap.xml");
 	}
-	
+
+	@Test	
 	public void testPut() throws InterruptedException{		
 		template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
 		template.sendBodyAndHeader("direct:put", "my-bar", HazelcastConstants.OBJECT_ID, "4711");
@@ -44,7 +46,8 @@ public class TestHazelcastMultimapProducerForSpring extends
 		assertTrue(values.contains("my-foo"));
 		assertTrue(values.contains("my-bar"));
 	}
-	
+
+	@Test	
 	public void testRemoveValue(){
 		map.put("4711", "my-foo");
 		map.put("4711", "my-bar");
@@ -56,7 +59,8 @@ public class TestHazelcastMultimapProducerForSpring extends
 		assertEquals(1, map.get("4711").size());
 		assertTrue(map.get("4711").contains("my-bar"));
 	}
-	
+
+	@Test	
 	public void testGet(){
 		map.put("4711", "my-foo");
 		
@@ -65,7 +69,8 @@ public class TestHazelcastMultimapProducerForSpring extends
 		
 		assertTrue(body.contains("my-foo"));
 	}
-	
+
+	@Test	
 	public void testDelete(){
 		map.put("4711", "my-foo");
 		assertEquals(1, map.size());

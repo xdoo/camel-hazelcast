@@ -21,7 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.CamelTestSupport;
+import org.apache.camel.test.junit4.CamelTestSupport;
+import org.junit.Test;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.IMap;
@@ -30,19 +31,22 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 
 	private IMap<String, Object> map;
 
+	@Override
 	public void setUp() throws Exception{
 		super.setUp();
 		
 		this.map = Hazelcast.getMap("foo");
 		this.map.clear();
 	}
-	
+
+	@Override	
 	public void tearDown()throws Exception{
 		super.tearDown();
 		
 		this.map.clear();
 	}
 
+	@Test
 	public void testAdd() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:added");
 		out.expectedMessageCount(1);
@@ -53,7 +57,8 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 		
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.ADDED);
 	}
-	
+
+	@Test	
 	public void testEnvict() throws InterruptedException{
 		MockEndpoint out = super.getMockEndpoint("mock:envicted");
 		out.expectedMessageCount(5);
@@ -67,7 +72,8 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 		
 		assertMockEndpointsSatisfied(30000, TimeUnit.MILLISECONDS);
 	}
-	
+
+	@Test	
 	public void testUpdate() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:updated");
 		out.expectedMessageCount(1);
@@ -79,7 +85,8 @@ public class TestHazelcastMapConsumer extends CamelTestSupport {
 		
 		this.checkHeaders(out.getExchanges().get(0).getIn().getHeaders(), HazelcastConstants.UPDATED);
 	}
-	
+
+	@Test	
 	public void testRemove() throws InterruptedException{
 		MockEndpoint out = getMockEndpoint("mock:removed");
 		out.expectedMessageCount(1);
