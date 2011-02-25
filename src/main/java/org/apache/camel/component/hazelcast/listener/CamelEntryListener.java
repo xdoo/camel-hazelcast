@@ -16,36 +16,36 @@
  */
 package org.apache.camel.component.hazelcast.listener;
 
-import org.apache.camel.component.hazelcast.HazelcastConstants;
-import org.apache.camel.component.hazelcast.HazelcastDefaultConsumer;
-
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.EntryListener;
 
+import org.apache.camel.component.hazelcast.HazelcastConstants;
+import org.apache.camel.component.hazelcast.HazelcastDefaultConsumer;
+
 /**
- *
+ * 
  * @author claus
- *
+ * 
  */
-public class CamelEntryListener extends CamelListener implements EntryListener<String, Object>{
+public class CamelEntryListener extends CamelListener implements EntryListener<String, Object> {
 
-	public CamelEntryListener(HazelcastDefaultConsumer consumer, String cacheName) {
-		super(consumer,cacheName);
-	}
+    public CamelEntryListener(HazelcastDefaultConsumer consumer, String cacheName) {
+        super(consumer, cacheName);
+    }
 
-	public void entryAdded(EntryEvent<String, Object> event) {
-		this.sendExchange(HazelcastConstants.ADDED, event.getKey(), event.getValue());
-	}
+    public void entryAdded(EntryEvent<String, Object> event) {
+        this.sendExchange(HazelcastConstants.ADDED, event.getKey(), event.getValue());
+    }
 
-	public void entryEvicted(EntryEvent<String, Object> event) {
-		this.sendExchange(HazelcastConstants.ENVICTED, event.getKey(), event.getValue());
-	}
+    public void entryEvicted(EntryEvent<String, Object> event) {
+        this.sendExchange(HazelcastConstants.ENVICTED, event.getKey(), event.getValue());
+    }
 
-	public void entryRemoved(EntryEvent<String, Object> event) {
-		this.sendExchange(HazelcastConstants.REMOVED, event.getKey(), event.getValue());
-	}
+    public void entryRemoved(EntryEvent<String, Object> event) {
+        this.sendExchange(HazelcastConstants.REMOVED, event.getKey(), event.getValue());
+    }
 
-	public void entryUpdated(EntryEvent<String, Object> event) {
-		this.sendExchange(HazelcastConstants.UPDATED, event.getKey(), event.getValue());
-	}
+    public void entryUpdated(EntryEvent<String, Object> event) {
+        this.sendExchange(HazelcastConstants.UPDATED, event.getKey(), event.getValue());
+    }
 }

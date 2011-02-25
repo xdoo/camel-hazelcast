@@ -25,23 +25,23 @@ import org.apache.camel.component.hazelcast.HazelcastDefaultEndpoint;
 
 /**
  * Hazelcast List {@link Endpoint} implementation.
- *
+ * 
  * @author ipolyzos
  */
-public class HazelcastListEndpoint extends HazelcastDefaultEndpoint{
+public class HazelcastListEndpoint extends HazelcastDefaultEndpoint {
 
-	public HazelcastListEndpoint(String endpointUri, Component component, String cacheName) {
-		super(endpointUri, component, cacheName);
-	}
+    public HazelcastListEndpoint(String endpointUri, Component component, String cacheName) {
+        super(endpointUri, component, cacheName);
+    }
 
-	@Override
-	public Consumer createConsumer(Processor processor) throws Exception {
-		return new HazelcastListConsumer(this, processor, cacheName);
-	}
+    @Override
+    public Consumer createConsumer(Processor processor) throws Exception {
+        return new HazelcastListConsumer(this, processor, cacheName);
+    }
 
-	@Override
-	public Producer createProducer() throws Exception {
-		return new HazelcastListProducer(this, cacheName);
-	}
+    @Override
+    public Producer createProducer() throws Exception {
+        return new HazelcastListProducer(this, cacheName);
+    }
 
 }

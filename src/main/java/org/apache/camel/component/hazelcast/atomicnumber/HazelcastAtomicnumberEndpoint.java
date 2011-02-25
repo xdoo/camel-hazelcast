@@ -24,17 +24,16 @@ import org.apache.camel.component.hazelcast.HazelcastDefaultEndpoint;
 
 public class HazelcastAtomicnumberEndpoint extends HazelcastDefaultEndpoint {
 
-	public HazelcastAtomicnumberEndpoint(String uri, Component component, String cacheName) {
-		super(uri, component, cacheName);
-	}
+    public HazelcastAtomicnumberEndpoint(String uri, Component component, final String cacheName) {
+        super(uri, component, cacheName);
+    }
 
-	public Consumer createConsumer(Processor processor) throws Exception {
-		throw new UnsupportedOperationException(
-				"You cannot send messages to this endpoint: " + getEndpointUri());
-	}
+    public Consumer createConsumer(Processor processor) throws Exception {
+        throw new UnsupportedOperationException("You cannot send messages to this endpoint: " + getEndpointUri());
+    }
 
-	public Producer createProducer() throws Exception {
-		return new HazelcastAtomicnumberProducer(this, cacheName);
-	}
+    public Producer createProducer() throws Exception {
+        return new HazelcastAtomicnumberProducer(this, cacheName);
+    }
 
 }

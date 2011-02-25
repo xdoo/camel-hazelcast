@@ -22,76 +22,73 @@ import org.junit.Test;
 
 public class TestHazelcastErrorMessages extends CamelTestSupport {
 
-	@Test
-	public void testUriPrefix(){
-		RouteBuilder builder = new RouteBuilder() {
-			
-			@Override
-			public void configure() throws Exception {
-				
-				from("direct:prefix")
-				.to("hazelcast:error:foo");
-				
-			}
-		};
-		
-		try {
-			context.addRoutes(builder);
-		} catch (Exception e) {
-			assertTrue(e.getMessage().contains("Your URI does not provide a correct 'type' prefix. It should be anything like 'hazelcast:[map:|multimap:|atomicvalue:|instance:|queue:|seda:|list:]name' but is 'hazelcast://error:foo"));
-		}
-	}
+    @Test
+    public void testUriPrefix() {
+        RouteBuilder builder = new RouteBuilder() {
 
-	@Test	
-	public void testAtomicNumberConsumer(){
-		RouteBuilder builder = new RouteBuilder() {
-			
-			@Override
-			public void configure() throws Exception {
-				
-				from("hazelcast:atomicvalue:foo")
-				.to("seda:out");
-				
-			}
-		};
-		
-		try {
-			context.addRoutes(builder);
-		} catch (Exception e) {
-			assertTrue(e.getMessage().contains("You cannot send messages to this endpoint: hazelcast://atomicvalue:foo"));
-		}
-	}
+            @Override
+            public void configure() throws Exception {
 
-	@Test
-	public void testInstanceProducer(){
-		RouteBuilder builder = new RouteBuilder() {
-			
-			@Override
-			public void configure() throws Exception {
-				
-				from("direct:foo")
-				.to("hazelcast:instance:foo");
-				
-			}
-		};
-		
-		try {
-			context.addRoutes(builder);
-		} catch (Exception e) {
-			assertTrue(e.getMessage().contains("You cannot send messages to this endpoint: hazelcast://instance:foo"));
-		}
-	}
-	
-	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
-		return new RouteBuilder() {
-			@Override
-			public void configure() throws Exception {
-				
-                		
-			}
-		};
-	}
-	
+                from("direct:prefix").to("hazelcast:error:foo");
+
+            }
+        };
+
+        try {
+            context.addRoutes(builder);
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains(
+                    "Your URI does not provide a correct 'type' prefix. It should be anything like "
+                            + "'hazelcast:[map:|multimap:|atomicvalue:|instance:|queue:|seda:|list:]name' but is 'hazelcast://error:foo"));
+        }
+    }
+
+    @Test
+    public void testAtomicNumberConsumer() {
+        RouteBuilder builder = new RouteBuilder() {
+
+            @Override
+            public void configure() throws Exception {
+
+                from("hazelcast:atomicvalue:foo").to("seda:out");
+
+            }
+        };
+
+        try {
+            context.addRoutes(builder);
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("You cannot send messages to this endpoint: hazelcast://atomicvalue:foo"));
+        }
+    }
+
+    @Test
+    public void testInstanceProducer() {
+        RouteBuilder builder = new RouteBuilder() {
+
+            @Override
+            public void configure() throws Exception {
+
+                from("direct:foo").to("hazelcast:instance:foo");
+
+            }
+        };
+
+        try {
+            context.addRoutes(builder);
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("You cannot send messages to this endpoint: hazelcast://instance:foo"));
+        }
+    }
+
+    @Override
+    protected RouteBuilder createRouteBuilder() throws Exception {
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+
+            }
+        };
+    }
+
 }
-

@@ -24,16 +24,16 @@ import org.apache.camel.component.hazelcast.HazelcastDefaultEndpoint;
 
 public class HazelcastMultimapEndpoint extends HazelcastDefaultEndpoint {
 
-	public HazelcastMultimapEndpoint(String uri, String cacheName, HazelcastComponent component) {
-		super(uri, component, cacheName);	
-	}
-	
-	public Consumer createConsumer(Processor processor) throws Exception {
-		return new HazelcastMultimapConsumer(this, processor, cacheName);
-	}
+    public HazelcastMultimapEndpoint(String uri, String cacheName, HazelcastComponent component) {
+        super(uri, component, cacheName);
+    }
 
-	public Producer createProducer() throws Exception {
-		return new HazelcastMultimapProducer(this, cacheName);
-	}
+    public Consumer createConsumer(Processor processor) throws Exception {
+        return new HazelcastMultimapConsumer(this, processor, cacheName);
+    }
+
+    public Producer createProducer() throws Exception {
+        return new HazelcastMultimapProducer(this, cacheName);
+    }
 
 }

@@ -22,12 +22,12 @@ import org.apache.camel.impl.DefaultConsumer;
 
 public class HazelcastDefaultConsumer extends DefaultConsumer {
 
-	protected String cacheName;
+    protected String cacheName;
 
-	public HazelcastDefaultConsumer(Endpoint endpoint, Processor processor, String cacheName) {
-		super(endpoint, processor);
+    public HazelcastDefaultConsumer(Endpoint endpoint, Processor processor, String cacheName) {
+        super(endpoint, processor);
 
-		this.cacheName = cacheName;
-	}
+        this.cacheName = cacheName;
+    }
 
 }

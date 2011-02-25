@@ -26,9 +26,8 @@ import org.apache.camel.Producer;
 import org.apache.camel.impl.DefaultProducer;
 
 /**
- * Implementation of Hazelcast SEDA {@link Producer} component. Just appends
- * exchange body into a Hazelcast {@link BlockingQueue}.
- *
+ * Implementation of Hazelcast SEDA {@link Producer} component. Just appends exchange body into a Hazelcast {@link BlockingQueue}.
+ * 
  * @author ipolyzos
  */
 public class HazelcastSedaProducer extends DefaultProducer implements AsyncProcessor {
@@ -41,27 +40,27 @@ public class HazelcastSedaProducer extends DefaultProducer implements AsyncProce
     }
 
     public void process(final Exchange exchange) throws Exception {
-    	checkAndStore(exchange);
+        checkAndStore(exchange);
     }
 
-	public boolean process(final Exchange exchange, final AsyncCallback callback) {
-    	checkAndStore(exchange);
+    public boolean process(final Exchange exchange, final AsyncCallback callback) {
+        checkAndStore(exchange);
         callback.done(true);
         return true;
     }
 
     private void checkAndStore(final Exchange exchange) {
-    	Object obj;
-    	Object body = exchange.getIn().getBody();
+        Object obj;
+        Object body = exchange.getIn().getBody();
 
-    	// in case body is not serializable convert to byte array
-    	if (!(body instanceof Serializable)){
+        // in case body is not serializable convert to byte array
+        if (!(body instanceof Serializable)) {
             obj = exchange.getIn().getBody(byte[].class);
-        }else{
-        	obj=body;
+        } else {
+            obj = body;
         }
 
-    	queue.add(obj);
+        queue.add(obj);
     }
 
 }

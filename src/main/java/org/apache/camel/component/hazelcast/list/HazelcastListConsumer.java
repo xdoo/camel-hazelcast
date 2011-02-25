@@ -16,28 +16,29 @@
  */
 package org.apache.camel.component.hazelcast.list;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.IList;
+
 import org.apache.camel.Consumer;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Processor;
 import org.apache.camel.component.hazelcast.HazelcastDefaultConsumer;
 import org.apache.camel.component.hazelcast.listener.CamelItemListener;
 
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.IList;
 
 /**
  * Implementation of Hazelcast List {@link Consumer}.
- *
+ * 
  * @author ipolyzos
- *
+ * 
  */
 public class HazelcastListConsumer extends HazelcastDefaultConsumer {
 
-	public HazelcastListConsumer(Endpoint endpoint, Processor processor, String cacheName) {
-		super(endpoint, processor, cacheName);
+    public HazelcastListConsumer(Endpoint endpoint, Processor processor, String cacheName) {
+        super(endpoint, processor, cacheName);
 
-		IList<Object> queue = Hazelcast.getList(cacheName);
-		queue.addItemListener(new CamelItemListener(this, cacheName), true);
-	}
+        IList<Object> queue = Hazelcast.getList(cacheName);
+        queue.addItemListener(new CamelItemListener(this, cacheName), true);
+    }
 
 }

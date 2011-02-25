@@ -25,49 +25,45 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 
-
 /**
  * Test FIFO ordering.
- *
+ * 
  * @author ipolyzos
  */
 
-//@Ignore("Tests should run manually.")
+// @Ignore("Tests should run manually.")
 public class TestHazelcastSedaFIFO extends CamelTestSupport {
 
-	@EndpointInject(uri = "mock:result")
-	private MockEndpoint mock;
+    @EndpointInject(uri = "mock:result")
+    private MockEndpoint mock;
 
+    @Test
+    public void fifoTesting() throws Exception {
+        final int bodyCount = 5;
 
-	@Test
-	public void fifoTesting() throws Exception {
-		final int bodyCount = 5;
+        List<String> bodies = new ArrayList<String>();
+        for (int i = 0; i < bodyCount; i++) {
+            bodies.add("test" + i);
+        }
 
-		List<String> bodies = new ArrayList<String>();
-		for (int i = 0; i < bodyCount; i++) {
-			bodies.add("test" + i);
-		}
+        mock.expectedBodiesReceived(bodies);
+        mock.expectedMessageCount(bodyCount);
 
-		mock.expectedBodiesReceived(bodies);
-		mock.expectedMessageCount(bodyCount);
+        for (int i = 0; i < bodyCount; i++) {
+            template.sendBody("hazelcast:seda:foo", "test" + i);
+        }
 
-		for (int i = 0; i < bodyCount; i++) {
-			template.sendBody("hazelcast:seda:foo", "test" + i);
-		}
+        assertMockEndpointsSatisfied();
+        mock.reset();
+    }
 
-		assertMockEndpointsSatisfied();
-		mock.reset();
-	}
-
-
-	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
-		return new RouteBuilder() {
-			@Override
-			public void configure() throws Exception {
-				from("hazelcast:seda:foo")
-					.to("mock:result");
-			}
-		};
-	}
+    @Override
+    protected RouteBuilder createRouteBuilder() throws Exception {
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("hazelcast:seda:foo").to("mock:result");
+            }
+        };
+    }
 }

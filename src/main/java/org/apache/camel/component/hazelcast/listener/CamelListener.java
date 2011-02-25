@@ -23,49 +23,44 @@ import org.apache.camel.component.hazelcast.HazelcastDefaultConsumer;
 
 public class CamelListener {
 
-	private final String cacheName;
-	private final HazelcastDefaultConsumer consumer;
+    private final String cacheName;
+    private final HazelcastDefaultConsumer consumer;
 
-	public CamelListener(HazelcastDefaultConsumer consumer, String cacheName) {
-		super();
-		this.cacheName= cacheName;
-		this.consumer = consumer;
-	}
+    public CamelListener(HazelcastDefaultConsumer consumer, String cacheName) {
+        super();
+        this.cacheName = cacheName;
+        this.consumer = consumer;
+    }
 
-	protected void sendExchange(String operation, String key, Object value){
-		Exchange exchange = consumer.getEndpoint().createExchange();
+    protected void sendExchange(String operation, String key, Object value) {
+        Exchange exchange = consumer.getEndpoint().createExchange();
 
-		//set object to body
-		exchange.getOut().setBody(value);
+        // set object to body
+        exchange.getOut().setBody(value);
 
-		//set headers
-		if (key != null){
-			exchange.getOut().setHeader(HazelcastConstants.OBJECT_ID, key);
-		}
+        // set headers
+        if (key != null) {
+            exchange.getOut().setHeader(HazelcastConstants.OBJECT_ID, key);
+        }
 
-		HazelcastComponentHelper.setListenerHeaders(
-				exchange,
-				HazelcastConstants.CACHE_LISTENER,
-				operation,
-				cacheName);
+        HazelcastComponentHelper.setListenerHeaders(exchange, HazelcastConstants.CACHE_LISTENER, operation, cacheName);
 
-		try {
-			consumer.getProcessor().process(exchange);
-		} catch (Exception e) {
-			if (exchange.getException() != null) {
-				consumer.getExceptionHandler().handleException(
-						String.format("Error processing exchange for hazelcast consumer on object '%s' in cache '%s'.", key, cacheName), exchange,
-				exchange.getException());
-			}
-		}
-	}
+        try {
+            consumer.getProcessor().process(exchange);
+        } catch (Exception e) {
+            if (exchange.getException() != null) {
+                consumer.getExceptionHandler().handleException(String.format("Error processing exchange for hazelcast consumer on object '%s' in cache '%s'.", key, cacheName), exchange,
+                        exchange.getException());
+            }
+        }
+    }
 
-	public String getCacheName() {
-		return cacheName;
-	}
+    public String getCacheName() {
+        return cacheName;
+    }
 
-	public HazelcastDefaultConsumer getConsumer() {
-		return consumer;
-	}
+    public HazelcastDefaultConsumer getConsumer() {
+        return consumer;
+    }
 
 }

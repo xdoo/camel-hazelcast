@@ -19,83 +19,76 @@ package org.apache.camel.component.hazelcast;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
-
 public class TestHazelcastInstanceConsumer extends CamelTestSupport {
 
-	@Test
-	public void testAddInstance() throws InterruptedException{
+    @Test
+    public void testAddInstance() throws InterruptedException {
 
-		MockEndpoint added = getMockEndpoint("mock:added");
-		added.setExpectedMessageCount(2);
+        MockEndpoint added = getMockEndpoint("mock:added");
+        added.setExpectedMessageCount(2);
 
-		Hazelcast.newHazelcastInstance(null);
-		Hazelcast.newHazelcastInstance(null);
+        Hazelcast.newHazelcastInstance(null);
+        Hazelcast.newHazelcastInstance(null);
 
-		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
+        assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 
-		//check headers
-		Exchange ex = added.getExchanges().get(0);
-		Map<String, Object> headers = ex.getIn().getHeaders();
+        // check headers
+        Exchange ex = added.getExchanges().get(0);
+        Map<String, Object> headers = ex.getIn().getHeaders();
 
-		this.checkHeaders(headers, HazelcastConstants.ADDED);
+        this.checkHeaders(headers, HazelcastConstants.ADDED);
 
-		Hazelcast.shutdownAll();
-	}
+        Hazelcast.shutdownAll();
+    }
 
-	@Test
-	@SuppressWarnings("deprecation")
-	public void testRemoveInstance() throws InterruptedException{
+    @Test
+    @SuppressWarnings("deprecation")
+    public void testRemoveInstance() throws InterruptedException {
 
-		MockEndpoint removed = getMockEndpoint("mock:removed");
-		removed.setExpectedMessageCount(1);
+        MockEndpoint removed = getMockEndpoint("mock:removed");
+        removed.setExpectedMessageCount(1);
 
-		HazelcastInstance h1 = Hazelcast.newHazelcastInstance(null);
+        HazelcastInstance h1 = Hazelcast.newHazelcastInstance(null);
 
-		//TODO --> check how an instance can be killed...
-		h1.shutdown();
+        // TODO --> check how an instance can be killed...
+        h1.shutdown();
 
-		assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
+        assertMockEndpointsSatisfied(5000, TimeUnit.MILLISECONDS);
 
-		//check headers
-		Exchange ex = removed.getExchanges().get(0);
-		Map<String, Object> headers = ex.getIn().getHeaders();
+        // check headers
+        Exchange ex = removed.getExchanges().get(0);
+        Map<String, Object> headers = ex.getIn().getHeaders();
 
-		this.checkHeaders(headers, HazelcastConstants.REMOVED);
+        this.checkHeaders(headers, HazelcastConstants.REMOVED);
 
-		Hazelcast.shutdownAll();
-	}
+        Hazelcast.shutdownAll();
+    }
 
-	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
-		return new RouteBuilder() {
-			@Override
-			public void configure() throws Exception {
-				from(String.format("hazelcast:%sfoo", HazelcastConstants.INSTANCE_PREFIX))
-				.log("instance...")
-				.choice()
-                	.when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED))
-                		.log("...added")
-                		.to("mock:added")
-                	.otherwise()
-                		.log("...removed")
-                		.to("mock:removed");
-			}
-		};
-	}
+    @Override
+    protected RouteBuilder createRouteBuilder() throws Exception {
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from(String.format("hazelcast:%sfoo", HazelcastConstants.INSTANCE_PREFIX)).log("instance...").choice()
+                        .when(header(HazelcastConstants.LISTENER_ACTION).isEqualTo(HazelcastConstants.ADDED)).log("...added").to("mock:added").otherwise().log("...removed").to("mock:removed");
+            }
+        };
+    }
 
-	private void checkHeaders(Map<String, Object> headers, String action){
-		assertEquals(action, headers.get(HazelcastConstants.LISTENER_ACTION));
-		assertEquals(HazelcastConstants.INSTANCE_LISTENER, headers.get(HazelcastConstants.LISTENER_TYPE));
-		assertNotNull(headers.get(HazelcastConstants.LISTENER_TIME));
-		assertNotNull(headers.get(HazelcastConstants.INSTANCE_HOST));
-		assertNotNull(headers.get(HazelcastConstants.INSTANCE_PORT));
-	}
+    private void checkHeaders(Map<String, Object> headers, String action) {
+        assertEquals(action, headers.get(HazelcastConstants.LISTENER_ACTION));
+        assertEquals(HazelcastConstants.INSTANCE_LISTENER, headers.get(HazelcastConstants.LISTENER_TYPE));
+        assertNotNull(headers.get(HazelcastConstants.LISTENER_TIME));
+        assertNotNull(headers.get(HazelcastConstants.INSTANCE_HOST));
+        assertNotNull(headers.get(HazelcastConstants.INSTANCE_PORT));
+    }
 }

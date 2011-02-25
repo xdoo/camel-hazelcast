@@ -18,120 +18,119 @@ package org.apache.camel.component.hazelcast.list;
 
 import java.util.Map;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.IList;
+
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Producer;
 import org.apache.camel.component.hazelcast.HazelcastComponentHelper;
 import org.apache.camel.component.hazelcast.HazelcastConstants;
 import org.apache.camel.impl.DefaultProducer;
-import org.apache.camel.util.ObjectHelper;
 
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.IList;
 
 /**
  * Implementation of Hazelcast SEDA {@link Producer}.
- *
+ * 
  * @author ipolyzos
  */
 public class HazelcastListProducer extends DefaultProducer {
 
-	private IList<Object> list;
-	private HazelcastComponentHelper helper;
+    private IList<Object> list;
+    private HazelcastComponentHelper helper;
 
-	public HazelcastListProducer(Endpoint endpoint, String listName) {
-		super(endpoint);
-		this.list = Hazelcast.getList(listName);
-	}
+    public HazelcastListProducer(Endpoint endpoint, String listName) {
+        super(endpoint);
+        this.list = Hazelcast.getList(listName);
+    }
 
-	public void process(Exchange exchange) throws Exception {
+    public void process(Exchange exchange) throws Exception {
 
-		Map<String, Object> headers = exchange.getIn().getHeaders();
+        Map<String, Object> headers = exchange.getIn().getHeaders();
 
-		// get header parameters
-		int operation = -1;
-		Integer pos = null;
+        // get header parameters
+        int operation = -1;
+        Integer pos = null;
 
-		if(headers.containsKey(HazelcastConstants.OBJECT_POS)){
-			if (!(headers.get(HazelcastConstants.OBJECT_POS) instanceof Integer)){
-				throw new IllegalArgumentException("OBJECT_POS Should be of type Integer");
-			}
-			pos = (Integer) headers.get(HazelcastConstants.OBJECT_POS);
-		}
+        if (headers.containsKey(HazelcastConstants.OBJECT_POS)) {
+            if (!(headers.get(HazelcastConstants.OBJECT_POS) instanceof Integer)) {
+                throw new IllegalArgumentException("OBJECT_POS Should be of type Integer");
+            }
+            pos = (Integer) headers.get(HazelcastConstants.OBJECT_POS);
+        }
 
-		if (headers.containsKey(HazelcastConstants.OPERATION)) {
-			if(headers.get(HazelcastConstants.OPERATION) instanceof String){
-				operation = this.helper.lookupOperationNumber((String) headers.get(HazelcastConstants.OPERATION));
-			} else {
-				operation = (Integer) headers.get(HazelcastConstants.OPERATION);
-			}
-		}
+        if (headers.containsKey(HazelcastConstants.OPERATION)) {
+            if (headers.get(HazelcastConstants.OPERATION) instanceof String) {
+                operation = this.helper.lookupOperationNumber((String) headers.get(HazelcastConstants.OPERATION));
+            } else {
+                operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+            }
+        }
 
-		switch (operation) {
+        switch (operation) {
 
-			case HazelcastConstants.ADD_OPERATION:
-				this.add(pos,exchange);
-				break;
+        case HazelcastConstants.ADD_OPERATION:
+            this.add(pos, exchange);
+            break;
 
-			case HazelcastConstants.GET_OPERATION:
-				this.get(pos,exchange);
-				break;
+        case HazelcastConstants.GET_OPERATION:
+            this.get(pos, exchange);
+            break;
 
-			case HazelcastConstants.SETVALUE_OPERATION:
-				this.set(pos,exchange);
-				break;
+        case HazelcastConstants.SETVALUE_OPERATION:
+            this.set(pos, exchange);
+            break;
 
-			case HazelcastConstants.REMOVEVALUE_OPERATION:
-				this.remove(pos,exchange);
-				break;
+        case HazelcastConstants.REMOVEVALUE_OPERATION:
+            this.remove(pos, exchange);
+            break;
 
-		default:
-			throw new IllegalArgumentException(String.format("The value '%s' is not allowed for parameter '%s' on the LIST cache.",
-					operation, HazelcastConstants.OPERATION));
-		}
+        default:
+            throw new IllegalArgumentException(String.format("The value '%s' is not allowed for parameter '%s' on the LIST cache.", operation, HazelcastConstants.OPERATION));
+        }
 
-		// finally copy headers
-		HazelcastComponentHelper.copyHeaders(exchange);
-	}
+        // finally copy headers
+        HazelcastComponentHelper.copyHeaders(exchange);
+    }
 
-	private void add(Integer pos,Exchange exchange) {
-		final Object body = exchange.getIn().getBody();
-		if (null==pos){
-			//add the specified element to the end of the list
-			list.add(body);
-		}else{
-			// add the specified element at the specified position
-			list.add(pos,body);
-		}
-	}
+    private void add(Integer pos, Exchange exchange) {
+        final Object body = exchange.getIn().getBody();
+        if (null == pos) {
+            // add the specified element to the end of the list
+            list.add(body);
+        } else {
+            // add the specified element at the specified position
+            list.add(pos, body);
+        }
+    }
 
-	private void get(Integer pos,Exchange exchange) {
-		// TODO: this operation is currently not supported by hazelcast
-		exchange.getOut().setBody(this.list.get(pos));
-	}
+    private void get(Integer pos, Exchange exchange) {
+        // TODO: this operation is currently not supported by hazelcast
+        exchange.getOut().setBody(this.list.get(pos));
+    }
 
-	private void set(Integer pos, Exchange exchange) {
-		// TODO: this operation is currently not supported by hazelcast
+    private void set(Integer pos, Exchange exchange) {
+        // TODO: this operation is currently not supported by hazelcast
 
-		if (null==pos){
-			throw new IllegalArgumentException("Empty position for set operation.");
-		}else{
-			final Object body = exchange.getIn().getBody();
-			list.set(pos,body);
-		}
-	}
+        if (null == pos) {
+            throw new IllegalArgumentException("Empty position for set operation.");
+        } else {
+            final Object body = exchange.getIn().getBody();
+            list.set(pos, body);
+        }
+    }
 
-	private void remove(Integer pos,Exchange exchange) {
-		if (null==pos){
-			//removes the first occurrence in the list
-			final Object body = exchange.getIn().getBody();
-			list.remove(body);
-		}else{
-			// TODO: this operation is currently not supported by hazelcast
+    private void remove(Integer pos, Exchange exchange) {
+        if (null == pos) {
+            // removes the first occurrence in the list
+            final Object body = exchange.getIn().getBody();
+            list.remove(body);
+        } else {
+            // TODO: this operation is currently not supported by hazelcast
 
-			//removes the element at the specified position
-			int position = pos;
-			list.remove(position);
-		}
-	}
+            // removes the element at the specified position
+            int position = pos;
+            list.remove(position);
+        }
+    }
 }

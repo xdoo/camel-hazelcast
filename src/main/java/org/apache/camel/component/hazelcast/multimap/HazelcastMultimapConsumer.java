@@ -16,21 +16,21 @@
  */
 package org.apache.camel.component.hazelcast.multimap;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.MultiMap;
+
 import org.apache.camel.Endpoint;
 import org.apache.camel.Processor;
 import org.apache.camel.component.hazelcast.HazelcastDefaultConsumer;
 import org.apache.camel.component.hazelcast.listener.CamelEntryListener;
 
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.MultiMap;
-
 public class HazelcastMultimapConsumer extends HazelcastDefaultConsumer {
 
-	public HazelcastMultimapConsumer(Endpoint endpoint, Processor processor, String cacheName) {
-		super(endpoint, processor, cacheName);
+    public HazelcastMultimapConsumer(Endpoint endpoint, Processor processor, String cacheName) {
+        super(endpoint, processor, cacheName);
 
-		MultiMap<String, Object> cache = Hazelcast.getMultiMap(cacheName);
-		cache.addEntryListener(new CamelEntryListener(this,cacheName), true);
-	}
+        MultiMap<String, Object> cache = Hazelcast.getMultiMap(cacheName);
+        cache.addEntryListener(new CamelEntryListener(this, cacheName), true);
+    }
 
 }

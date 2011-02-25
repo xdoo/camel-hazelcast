@@ -16,28 +16,29 @@
  */
 package org.apache.camel.component.hazelcast.listener;
 
+import com.hazelcast.core.ItemListener;
+
 import org.apache.camel.component.hazelcast.HazelcastConstants;
 import org.apache.camel.component.hazelcast.HazelcastDefaultConsumer;
 
-import com.hazelcast.core.ItemListener;
 
 /**
- *
+ * 
  * @author omicron
- *
+ * 
  */
-public class CamelItemListener extends CamelListener implements ItemListener<Object>{
+public class CamelItemListener extends CamelListener implements ItemListener<Object> {
 
-	public CamelItemListener(HazelcastDefaultConsumer consumer, String cacheName) {
-		super(consumer,cacheName);
-	}
+    public CamelItemListener(HazelcastDefaultConsumer consumer, String cacheName) {
+        super(consumer, cacheName);
+    }
 
-	public void itemAdded(Object item) {
-		this.sendExchange(HazelcastConstants.ADDED, null,item);
-	}
+    public void itemAdded(Object item) {
+        this.sendExchange(HazelcastConstants.ADDED, null, item);
+    }
 
-	public void itemRemoved(Object item) {
-		this.sendExchange(HazelcastConstants.REMOVED, null ,item);
-	}
+    public void itemRemoved(Object item) {
+        this.sendExchange(HazelcastConstants.REMOVED, null, item);
+    }
 
 }

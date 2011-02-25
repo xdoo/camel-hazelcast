@@ -24,18 +24,17 @@ import org.apache.camel.component.hazelcast.HazelcastDefaultEndpoint;
 
 public class HazelcastInstanceEndpoint extends HazelcastDefaultEndpoint {
 
-	public HazelcastInstanceEndpoint(String uri, HazelcastComponent component) {
-		super(uri, component);
-	}
+    public HazelcastInstanceEndpoint(String uri, HazelcastComponent component) {
+        super(uri, component);
+    }
 
-	public Consumer createConsumer(Processor processor) throws Exception {
-		return new HazelcastInstanceConsumer(this, processor);
-	}
+    public Consumer createConsumer(Processor processor) throws Exception {
+        return new HazelcastInstanceConsumer(this, processor);
+    }
 
-	public Producer createProducer() throws Exception {
-		throw new UnsupportedOperationException(
-				"You cannot send messages to this endpoint: " + getEndpointUri());
+    public Producer createProducer() throws Exception {
+        throw new UnsupportedOperationException("You cannot send messages to this endpoint: " + getEndpointUri());
 
-	}
+    }
 
 }

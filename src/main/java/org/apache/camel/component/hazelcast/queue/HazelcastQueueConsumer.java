@@ -16,26 +16,26 @@
  */
 package org.apache.camel.component.hazelcast.queue;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.IQueue;
+
 import org.apache.camel.Endpoint;
 import org.apache.camel.Processor;
 import org.apache.camel.component.hazelcast.HazelcastDefaultConsumer;
 import org.apache.camel.component.hazelcast.listener.CamelItemListener;
 
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.IQueue;
-
 /**
- *
+ * 
  * @author ipolyzos
- *
+ * 
  */
 public class HazelcastQueueConsumer extends HazelcastDefaultConsumer {
 
-	public HazelcastQueueConsumer(Endpoint endpoint, Processor processor, String cacheName) {
-		super(endpoint, processor, cacheName);
+    public HazelcastQueueConsumer(Endpoint endpoint, Processor processor, String cacheName) {
+        super(endpoint, processor, cacheName);
 
-		IQueue<Object> queue = Hazelcast.getQueue(cacheName);
-		queue.addItemListener(new CamelItemListener(this, cacheName), true);
-	}
+        IQueue<Object> queue = Hazelcast.getQueue(cacheName);
+        queue.addItemListener(new CamelItemListener(this, cacheName), true);
+    }
 
 }

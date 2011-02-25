@@ -18,41 +18,41 @@ package org.apache.camel.component.hazelcast.seda;
 
 /**
  * Hazelcast SEDA Component configuration.
- *
+ * 
  * @author ipolyzos
- *
+ * 
  */
 public class HazelcastSedaConfiguration {
 
-	private int concurrentConsumers = 1;
-	private int pollInterval = 1000;
-	private String queueName;
+    private int concurrentConsumers = 1;
+    private int pollInterval = 1000;
+    private String queueName;
 
-	public HazelcastSedaConfiguration() {
-		super();
-	}
+    public HazelcastSedaConfiguration() {
+        super();
+    }
 
-	public int getConcurrentConsumers() {
-		return concurrentConsumers;
-	}
+    public int getConcurrentConsumers() {
+        return concurrentConsumers;
+    }
 
-	public void setConcurrentConsumers(final int concurrentConsumers) {
-		this.concurrentConsumers = concurrentConsumers;
-	}
+    public void setConcurrentConsumers(final int concurrentConsumers) {
+        this.concurrentConsumers = concurrentConsumers;
+    }
 
-	public String getQueueName() {
-		return queueName;
-	}
+    public String getQueueName() {
+        return queueName;
+    }
 
-	public void setQueueName(final String queueName) {
-		this.queueName = queueName;
-	}
+    public void setQueueName(final String queueName) {
+        this.queueName = queueName;
+    }
 
-	public int getPollInterval() {
-		return pollInterval;
-	}
+    public int getPollInterval() {
+        return pollInterval;
+    }
 
-	public void setPollInterval(int pollInterval) {
-		this.pollInterval = pollInterval;
-	}
+    public void setPollInterval(int pollInterval) {
+        this.pollInterval = pollInterval;
+    }
 }

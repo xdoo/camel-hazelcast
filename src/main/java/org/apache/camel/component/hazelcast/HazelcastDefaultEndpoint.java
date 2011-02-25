@@ -24,24 +24,24 @@ import org.apache.camel.impl.DefaultEndpoint;
 
 public abstract class HazelcastDefaultEndpoint extends DefaultEndpoint {
 
-	protected String cacheName;
+    protected String cacheName;
 
-	public HazelcastDefaultEndpoint(String endpointUri, Component component, String cacheName) {
-		super(endpointUri, component);
+    public HazelcastDefaultEndpoint(String endpointUri, Component component, String cacheName) {
+        super(endpointUri, component);
 
-		this.cacheName = cacheName;
-	}
+        this.cacheName = cacheName;
+    }
 
-	public HazelcastDefaultEndpoint(String endpointUri, Component component) {
-		super(endpointUri, component);
-	}
+    public HazelcastDefaultEndpoint(String endpointUri, Component component) {
+        super(endpointUri, component);
+    }
 
-	public abstract Consumer createConsumer(Processor processor) throws Exception;
+    public abstract Consumer createConsumer(Processor processor) throws Exception;
 
-	public abstract Producer createProducer() throws Exception;
+    public abstract Producer createProducer() throws Exception;
 
-	public boolean isSingleton() {
-		return true;
-	}
+    public boolean isSingleton() {
+        return true;
+    }
 
 }

@@ -27,42 +27,40 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- *
+ * 
  * @author ipolyzos
- *
+ * 
  */
-//@Ignore("Tests should run manually.")
+// @Ignore("Tests should run manually.")
 public class TestHazelcastSedaInOnly extends CamelTestSupport {
 
-	@EndpointInject(uri = "mock:result")
-	private MockEndpoint mock;
+    @EndpointInject(uri = "mock:result")
+    private MockEndpoint mock;
 
-	@Test
-	public void sendInOnly() throws Exception {
-		mock.expectedMessageCount(1);
-		mock.expectedBodiesReceived("test");
+    @Test
+    public void sendInOnly() throws Exception {
+        mock.expectedMessageCount(1);
+        mock.expectedBodiesReceived("test");
 
-		template.send("direct:foo", ExchangePattern.InOnly, new Processor() {
-			public void process(Exchange exchange) throws Exception {
-				exchange.getIn().setBody("test");
-			}
-		});
+        template.send("direct:foo", ExchangePattern.InOnly, new Processor() {
+            public void process(Exchange exchange) throws Exception {
+                exchange.getIn().setBody("test");
+            }
+        });
 
-		assertMockEndpointsSatisfied();
-		mock.reset();
-	}
+        assertMockEndpointsSatisfied();
+        mock.reset();
+    }
 
-	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
-		return new RouteBuilder() {
-			@Override
-			public void configure() throws Exception {
-				from("direct:foo")
-					.to("hazelcast:seda:foo");
+    @Override
+    protected RouteBuilder createRouteBuilder() throws Exception {
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                from("direct:foo").to("hazelcast:seda:foo");
 
-				from("hazelcast:seda:foo")
-					.to("mock:result");
-			}
-		};
-	}
+                from("hazelcast:seda:foo").to("mock:result");
+            }
+        };
+    }
 }

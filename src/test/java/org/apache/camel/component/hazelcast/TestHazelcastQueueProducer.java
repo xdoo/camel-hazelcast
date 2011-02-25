@@ -19,144 +19,132 @@ package org.apache.camel.component.hazelcast;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
+import com.hazelcast.core.Hazelcast;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 
-import com.hazelcast.core.Hazelcast;
-
 /**
- *
+ * 
  * @author ipolyzos
- *
+ * 
  */
 public class TestHazelcastQueueProducer extends CamelTestSupport {
 
-	@Test
-	public void put() throws InterruptedException{
-		Queue<Object> queue = Hazelcast.getQueue("bar");
-		queue.clear();
+    @Test
+    public void put() throws InterruptedException {
+        Queue<Object> queue = Hazelcast.getQueue("bar");
+        queue.clear();
 
-		template.sendBody("direct:put", "foo");
+        template.sendBody("direct:put", "foo");
 
-		assertTrue(queue.contains("foo"));
+        assertTrue(queue.contains("foo"));
 
-		queue.clear();
-	}
+        queue.clear();
+    }
 
-	@Test
-	public void add() throws InterruptedException{
-		Queue<Object> queue = Hazelcast.getQueue("bar");
-		queue.clear();
+    @Test
+    public void add() throws InterruptedException {
+        Queue<Object> queue = Hazelcast.getQueue("bar");
+        queue.clear();
 
-		template.sendBody("direct:add", "bar");
+        template.sendBody("direct:add", "bar");
 
-		assertTrue(queue.contains("bar"));
+        assertTrue(queue.contains("bar"));
 
-		queue.clear();
-	}
+        queue.clear();
+    }
 
-	@Test
-	public void offer() throws InterruptedException{
-		Queue<Object> queue = Hazelcast.getQueue("bar");
-		queue.clear();
+    @Test
+    public void offer() throws InterruptedException {
+        Queue<Object> queue = Hazelcast.getQueue("bar");
+        queue.clear();
 
-		template.sendBody("direct:offer", "foobar");
-		assertTrue(queue.contains("foobar"));
+        template.sendBody("direct:offer", "foobar");
+        assertTrue(queue.contains("foobar"));
 
-		queue.clear();
-	}
+        queue.clear();
+    }
 
-	@Test
-	public void removeValue() throws InterruptedException{
-		BlockingQueue<String> queue = Hazelcast.getQueue("bar");
-		queue.clear();
+    @Test
+    public void removeValue() throws InterruptedException {
+        BlockingQueue<String> queue = Hazelcast.getQueue("bar");
+        queue.clear();
 
-		queue.put("foo1");
-		queue.put("foo2");
-		queue.put("foo3");
+        queue.put("foo1");
+        queue.put("foo2");
+        queue.put("foo3");
 
-		assertEquals(3, queue.size());
+        assertEquals(3, queue.size());
 
-		//specify the value to remove
-		template.sendBody("direct:removevalue", "foo2");
-		assertEquals(2, queue.size());
-		assertTrue(queue.contains("foo1") && queue.contains("foo3"));
+        // specify the value to remove
+        template.sendBody("direct:removevalue", "foo2");
+        assertEquals(2, queue.size());
+        assertTrue(queue.contains("foo1") && queue.contains("foo3"));
 
-		//do not specify the value to delete (null)
-		template.sendBody("direct:removevalue", null);
-		assertEquals(1, queue.size());
+        // do not specify the value to delete (null)
+        template.sendBody("direct:removevalue", null);
+        assertEquals(1, queue.size());
 
-		assertTrue(queue.contains("foo3"));
+        assertTrue(queue.contains("foo3"));
 
-		queue.clear();
-	}
+        queue.clear();
+    }
 
-	@Test
-	public void poll() throws InterruptedException{
-		BlockingQueue<String> queue = Hazelcast.getQueue("bar");
-		queue.clear();
+    @Test
+    public void poll() throws InterruptedException {
+        BlockingQueue<String> queue = Hazelcast.getQueue("bar");
+        queue.clear();
 
-		queue.put("foo");
-		assertEquals(1, queue.size());
+        queue.put("foo");
+        assertEquals(1, queue.size());
 
-		template.sendBody("direct:poll",null);
+        template.sendBody("direct:poll", null);
 
-		assertFalse(queue.contains("foo"));
-		assertEquals(0, queue.size());
+        assertFalse(queue.contains("foo"));
+        assertEquals(0, queue.size());
 
-		queue.clear();
-	}
+        queue.clear();
+    }
 
-	@Test
-	public void peek() throws InterruptedException{
-		BlockingQueue<String> queue = Hazelcast.getQueue("bar");
-		queue.clear();
+    @Test
+    public void peek() throws InterruptedException {
+        BlockingQueue<String> queue = Hazelcast.getQueue("bar");
+        queue.clear();
 
-		queue.put("foo");
-		assertEquals(1, queue.size());
+        queue.put("foo");
+        assertEquals(1, queue.size());
 
-		template.sendBody("direct:peek",null);
+        template.sendBody("direct:peek", null);
 
-		assertEquals(1, queue.size());
-		assertTrue(queue.contains("foo"));
+        assertEquals(1, queue.size());
+        assertTrue(queue.contains("foo"));
 
-		queue.clear();
-	}
+        queue.clear();
+    }
 
+    @Override
+    protected RouteBuilder createRouteBuilder() throws Exception {
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
 
-	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
-		return new RouteBuilder() {
-			@Override
-			public void configure() throws Exception {
+                from("direct:put").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION)).to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
 
-				from("direct:put")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION))
-				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+                from("direct:add").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.ADD_OPERATION)).to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
 
-				from("direct:add")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.ADD_OPERATION))
-				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+                from("direct:offer").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.OFFER_OPERATION)).to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
 
-				from("direct:offer")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.OFFER_OPERATION))
-				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+                from("direct:poll").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.POLL_OPERATION)).to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
 
-				from("direct:poll")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.POLL_OPERATION))
-				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+                from("direct:peek").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PEEK_OPERATION)).to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
 
-				from("direct:peek")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PEEK_OPERATION))
-				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
+                from("direct:removevalue").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.REMOVEVALUE_OPERATION)).to(
+                        String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
 
-				from("direct:removevalue")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.REMOVEVALUE_OPERATION))
-				.to(String.format("hazelcast:%sbar", HazelcastConstants.QUEUE_PREFIX));
-
-			}
-		};
-	}
+            }
+        };
+    }
 
 }

@@ -19,150 +19,142 @@ package org.apache.camel.component.hazelcast;
 import java.io.Serializable;
 import java.util.Collection;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.IMap;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.IMap;
-
 public class TestHazelcastMapProducer extends CamelTestSupport implements Serializable {
 
-	private IMap<String, Object> map;
+    private IMap<String, Object> map;
 
-	@Override
-	public void setUp() throws Exception{
-		super.setUp();
-		
-		this.map = Hazelcast.getMap("foo");
-		this.map.clear();
-	}
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
 
-	@Override	
-	public void tearDown()throws Exception{
-		super.tearDown();
-		
-		this.map.clear();
-	}
+        this.map = Hazelcast.getMap("foo");
+        this.map.clear();
+    }
 
-	@Test
-	public void testPut() throws InterruptedException{
-		template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
-		
-		assertTrue(map.containsKey("4711"));
-		assertEquals("my-foo", map.get("4711"));
-	}
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
 
-	@Test	
-	public void testUpdate(){
-		template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
-		
-		assertTrue(map.containsKey("4711"));
-		assertEquals("my-foo", map.get("4711"));
-		
-		template.sendBodyAndHeader("direct:update", "my-fooo", HazelcastConstants.OBJECT_ID, "4711");
-		assertEquals("my-fooo", map.get("4711"));
-	}
+        this.map.clear();
+    }
 
-	@Test	
-	public void testGet(){
-		map.put("4711", "my-foo");
-		
-		template.sendBodyAndHeader("direct:get", null, HazelcastConstants.OBJECT_ID, "4711");
-		String body = consumer.receiveBody("seda:out", 5000, String.class);
-		
-		assertEquals("my-foo", body);
-	}
+    @Test
+    public void testPut() throws InterruptedException {
+        template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
 
-	@Test	
-	public void testDelete(){
-		map.put("4711", "my-foo");
-		assertEquals(1, map.size());
-		
-		template.sendBodyAndHeader("direct:delete", null, HazelcastConstants.OBJECT_ID, "4711");
-		assertEquals(0, map.size());
-	}
+        assertTrue(map.containsKey("4711"));
+        assertEquals("my-foo", map.get("4711"));
+    }
 
-	@Test	
-	public void testQuery(){
-		map.put("1", new Dummy("alpha", 1000));
-		map.put("2", new Dummy("beta", 2000));
-		map.put("3", new Dummy("gamma", 3000));
-		
-		String q1 = "bar > 1000";
-		String q2 = "foo LIKE alp%";
-		
-		template.sendBodyAndHeader("direct:query", null, HazelcastConstants.QUERY, q1);
-		Collection<Dummy> b1 = consumer.receiveBody("seda:out", 5000, Collection.class);
-		
-		assertNotNull(b1);
-		assertEquals(2, b1.size());
-		
-		template.sendBodyAndHeader("direct:query", null, HazelcastConstants.QUERY, q2);
-		Collection<Dummy> b2 = consumer.receiveBody("seda:out", 5000, Collection.class);
-		
-		assertNotNull(b2);
-		assertEquals(1, b2.size());
-	}
-	
-	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
-		return new RouteBuilder() {
-			@Override
-			public void configure() throws Exception {
-				
-				from("direct:put")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION))
-				.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
-				
-				from("direct:update")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.UPDATE_OPERATION))
-				.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
-				
-				from("direct:get")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION))
-				.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
-				.to("seda:out");
-				
-				from("direct:delete")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.DELETE_OPERATION))
-				.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
-				
-				from("direct:query")
-				.setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.QUERY_OPERATION))
-				.to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
-				.to("seda:out");
-                		
-			}
-		};
-	}
+    @Test
+    public void testUpdate() {
+        template.sendBodyAndHeader("direct:put", "my-foo", HazelcastConstants.OBJECT_ID, "4711");
 
-	public class Dummy implements Serializable{
+        assertTrue(map.containsKey("4711"));
+        assertEquals("my-foo", map.get("4711"));
 
-		private static final long serialVersionUID = 3688457704655925278L;
-		
-		public Dummy(String foo, int bar){
-			this.foo = foo;
-			this.bar = bar;
-		}
-		
-		private String foo;
-		private int bar;
-		
-		
-		public String getFoo() {
-			return foo;
-		}
-		public void setFoo(String foo) {
-			this.foo = foo;
-		}
-		public int getBar() {
-			return bar;
-		}
-		public void setBar(int bar) {
-			this.bar = bar;
-		}
-		
-	}
-	
+        template.sendBodyAndHeader("direct:update", "my-fooo", HazelcastConstants.OBJECT_ID, "4711");
+        assertEquals("my-fooo", map.get("4711"));
+    }
+
+    @Test
+    public void testGet() {
+        map.put("4711", "my-foo");
+
+        template.sendBodyAndHeader("direct:get", null, HazelcastConstants.OBJECT_ID, "4711");
+        String body = consumer.receiveBody("seda:out", 5000, String.class);
+
+        assertEquals("my-foo", body);
+    }
+
+    @Test
+    public void testDelete() {
+        map.put("4711", "my-foo");
+        assertEquals(1, map.size());
+
+        template.sendBodyAndHeader("direct:delete", null, HazelcastConstants.OBJECT_ID, "4711");
+        assertEquals(0, map.size());
+    }
+
+    @Test
+    public void testQuery() {
+        map.put("1", new Dummy("alpha", 1000));
+        map.put("2", new Dummy("beta", 2000));
+        map.put("3", new Dummy("gamma", 3000));
+
+        String q1 = "bar > 1000";
+        String q2 = "foo LIKE alp%";
+
+        template.sendBodyAndHeader("direct:query", null, HazelcastConstants.QUERY, q1);
+        Collection<Dummy> b1 = consumer.receiveBody("seda:out", 5000, Collection.class);
+
+        assertNotNull(b1);
+        assertEquals(2, b1.size());
+
+        template.sendBodyAndHeader("direct:query", null, HazelcastConstants.QUERY, q2);
+        Collection<Dummy> b2 = consumer.receiveBody("seda:out", 5000, Collection.class);
+
+        assertNotNull(b2);
+        assertEquals(1, b2.size());
+    }
+
+    @Override
+    protected RouteBuilder createRouteBuilder() throws Exception {
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+
+                from("direct:put").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.PUT_OPERATION)).to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
+
+                from("direct:update").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.UPDATE_OPERATION)).to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
+
+                from("direct:get").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.GET_OPERATION)).to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
+                        .to("seda:out");
+
+                from("direct:delete").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.DELETE_OPERATION)).to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX));
+
+                from("direct:query").setHeader(HazelcastConstants.OPERATION, constant(HazelcastConstants.QUERY_OPERATION)).to(String.format("hazelcast:%sfoo", HazelcastConstants.MAP_PREFIX))
+                        .to("seda:out");
+
+            }
+        };
+    }
+
+    public class Dummy implements Serializable {
+
+        private static final long serialVersionUID = 3688457704655925278L;
+
+        private String foo;
+        private int bar;
+        
+        public Dummy(String foo, int bar) {
+            this.foo = foo;
+            this.bar = bar;
+        }
+
+        public String getFoo() {
+            return foo;
+        }
+
+        public void setFoo(String foo) {
+            this.foo = foo;
+        }
+
+        public int getBar() {
+            return bar;
+        }
+
+        public void setBar(int bar) {
+            this.bar = bar;
+        }
+
+    }
+
 }

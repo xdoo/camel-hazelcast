@@ -18,110 +18,110 @@ package org.apache.camel.component.hazelcast.queue;
 
 import java.util.Map;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.IQueue;
+
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.hazelcast.HazelcastComponentHelper;
 import org.apache.camel.component.hazelcast.HazelcastConstants;
 import org.apache.camel.impl.DefaultProducer;
 
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.IQueue;
 
 /**
- *
+ * 
  * @author ipolyzos
- *
+ * 
  */
 public class HazelcastQueueProducer extends DefaultProducer {
 
-	private IQueue<Object> queue;
-	private HazelcastComponentHelper helper;
+    private IQueue<Object> queue;
+    private HazelcastComponentHelper helper;
 
-	public HazelcastQueueProducer(Endpoint endpoint, String queueName) {
-		super(endpoint);
-		this.queue = Hazelcast.getQueue(queueName);
-	}
+    public HazelcastQueueProducer(Endpoint endpoint, String queueName) {
+        super(endpoint);
+        this.queue = Hazelcast.getQueue(queueName);
+    }
 
-	public void process(Exchange exchange) throws Exception {
+    public void process(Exchange exchange) throws Exception {
 
-		Map<String, Object> headers = exchange.getIn().getHeaders();
+        Map<String, Object> headers = exchange.getIn().getHeaders();
 
-		// get header parameters
-		int operation = -1;
+        // get header parameters
+        int operation = -1;
 
-		if (headers.containsKey(HazelcastConstants.OPERATION)) {
-			if(headers.get(HazelcastConstants.OPERATION) instanceof String){
-				operation = this.helper.lookupOperationNumber((String) headers.get(HazelcastConstants.OPERATION));
-			} else {
-				operation = (Integer) headers.get(HazelcastConstants.OPERATION);
-			}
-		}
+        if (headers.containsKey(HazelcastConstants.OPERATION)) {
+            if (headers.get(HazelcastConstants.OPERATION) instanceof String) {
+                operation = this.helper.lookupOperationNumber((String) headers.get(HazelcastConstants.OPERATION));
+            } else {
+                operation = (Integer) headers.get(HazelcastConstants.OPERATION);
+            }
+        }
 
-		switch (operation) {
+        switch (operation) {
 
-			case HazelcastConstants.ADD_OPERATION:
-				this.add(exchange);
-				break;
+        case HazelcastConstants.ADD_OPERATION:
+            this.add(exchange);
+            break;
 
-			case HazelcastConstants.PUT_OPERATION:
-				this.put(exchange);
-				break;
+        case HazelcastConstants.PUT_OPERATION:
+            this.put(exchange);
+            break;
 
-			case HazelcastConstants.POLL_OPERATION:
-				this.poll(exchange);
-				break;
+        case HazelcastConstants.POLL_OPERATION:
+            this.poll(exchange);
+            break;
 
-			case HazelcastConstants.PEEK_OPERATION:
-				this.peek(exchange);
-				break;
+        case HazelcastConstants.PEEK_OPERATION:
+            this.peek(exchange);
+            break;
 
-			case HazelcastConstants.OFFER_OPERATION:
-				this.offer(exchange);
-				break;
+        case HazelcastConstants.OFFER_OPERATION:
+            this.offer(exchange);
+            break;
 
-			case HazelcastConstants.REMOVEVALUE_OPERATION:
-				this.remove(exchange);
-				break;
+        case HazelcastConstants.REMOVEVALUE_OPERATION:
+            this.remove(exchange);
+            break;
 
-		default:
-			throw new IllegalArgumentException(String.format("The value '%s' is not allowed for parameter '%s' on the QUEUE cache.",
-					operation, HazelcastConstants.OPERATION));
-		}
+        default:
+            throw new IllegalArgumentException(String.format("The value '%s' is not allowed for parameter '%s' on the QUEUE cache.", operation, HazelcastConstants.OPERATION));
+        }
 
-		// finally copy headers
-		HazelcastComponentHelper.copyHeaders(exchange);
+        // finally copy headers
+        HazelcastComponentHelper.copyHeaders(exchange);
 
-	}
+    }
 
-	private void add(Exchange exchange) {
-		Object body = exchange.getIn().getBody();
-		this.queue.add(body);
-	}
+    private void add(Exchange exchange) {
+        Object body = exchange.getIn().getBody();
+        this.queue.add(body);
+    }
 
-	private void put(Exchange exchange) throws InterruptedException {
-		Object body = exchange.getIn().getBody();
-		this.queue.put(body);
-	}
+    private void put(Exchange exchange) throws InterruptedException {
+        Object body = exchange.getIn().getBody();
+        this.queue.put(body);
+    }
 
-	private void poll(Exchange exchange) {
-		exchange.getOut().setBody(this.queue.poll());
-	}
+    private void poll(Exchange exchange) {
+        exchange.getOut().setBody(this.queue.poll());
+    }
 
-	private void peek(Exchange exchange) {
-		exchange.getOut().setBody(this.queue.peek());
-	}
+    private void peek(Exchange exchange) {
+        exchange.getOut().setBody(this.queue.peek());
+    }
 
-	private void offer(Exchange exchange) {
-		Object body = exchange.getIn().getBody();
-		this.queue.offer(body);
-	}
+    private void offer(Exchange exchange) {
+        Object body = exchange.getIn().getBody();
+        this.queue.offer(body);
+    }
 
-	private void remove(Exchange exchange) {
-		Object body = exchange.getIn().getBody();
-		if (body!=null){
-			this.queue.remove(body);
-		}else{
-			this.queue.remove();
-		}
-	}
+    private void remove(Exchange exchange) {
+        Object body = exchange.getIn().getBody();
+        if (body != null) {
+            this.queue.remove(body);
+        } else {
+            this.queue.remove();
+        }
+    }
 }

@@ -23,24 +23,24 @@ import org.apache.camel.Producer;
 import org.apache.camel.component.hazelcast.HazelcastDefaultEndpoint;
 
 /**
- *
+ * 
  * @author ipolyzos
- *
+ * 
  */
-public class HazelcastQueueEndpoint extends HazelcastDefaultEndpoint{
+public class HazelcastQueueEndpoint extends HazelcastDefaultEndpoint {
 
-	public HazelcastQueueEndpoint(String endpointUri, Component component, String cacheName) {
-		super(endpointUri, component, cacheName);
-	}
+    public HazelcastQueueEndpoint(String endpointUri, Component component, String cacheName) {
+        super(endpointUri, component, cacheName);
+    }
 
-	@Override
-	public Consumer createConsumer(Processor processor) throws Exception {
-		return new HazelcastQueueConsumer(this, processor, cacheName);
-	}
+    @Override
+    public Consumer createConsumer(Processor processor) throws Exception {
+        return new HazelcastQueueConsumer(this, processor, cacheName);
+    }
 
-	@Override
-	public Producer createProducer() throws Exception {
-		return new HazelcastQueueProducer(this, cacheName);
-	}
+    @Override
+    public Producer createProducer() throws Exception {
+        return new HazelcastQueueProducer(this, cacheName);
+    }
 
 }

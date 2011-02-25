@@ -25,25 +25,25 @@ import org.junit.Test;
 
 /**
  * Test concurrent consumers.
- *
+ * 
  * @author ipolyzos
  */
 
-//@Ignore("Tests should run manually.")
+// @Ignore("Tests should run manually.")
 public class TestHazelcastSedaConcurrentConsumers extends CamelTestSupport {
 
-	@EndpointInject(uri = "mock:result")
-	private MockEndpoint mock;
+    @EndpointInject(uri = "mock:result")
+    private MockEndpoint mock;
 
-	@Test
+    @Test
     public void createConcurrentConsumers() throws Exception {
         int bodyCount = 5;
 
         mock.expectedBodiesReceived("test");
         mock.expectedMessageCount(bodyCount);
 
-        for (int i=0;i<bodyCount;i++){
-        	template.sendBody("hazelcast:seda:foo?concurrentConsumers=4", "test");
+        for (int i = 0; i < bodyCount; i++) {
+            template.sendBody("hazelcast:seda:foo?concurrentConsumers=4", "test");
         }
 
         assertMockEndpointsSatisfied();
@@ -55,9 +55,7 @@ public class TestHazelcastSedaConcurrentConsumers extends CamelTestSupport {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                from("hazelcast:seda:foo?concurrentConsumers=4")
-                	.threads(6)
-                	.to("mock:result");
+                from("hazelcast:seda:foo?concurrentConsumers=4").threads(6).to("mock:result");
             }
         };
     }
