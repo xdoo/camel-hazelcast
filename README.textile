@@ -1,3 +1,8 @@
+h3. Code Moved!
+
+The code of this project has been committed to th Apache Camel project. In future all changes will be directly send to the Apache SVN. So this repository will never be updated and is now outdated.
+
+
 h3. camel-hazelcast plugin
 
 Hazelcast is a ligthwight data grid written entirely in Java and published under apache licence. You can find more on "www.hazelcast.com":http://www.hazelcast.com/. Inside the datagrid you can store your data in maps, multimaps (same key, n values), queues, sets, topics and as a special artifact atomic numbers. This camel component focuses on maps, multimaps and atomic numbers. As special feature it provides a simple cluster support.
