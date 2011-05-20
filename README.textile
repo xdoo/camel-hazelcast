@@ -1,4 +1,4 @@
-h3. Code Moved!
+h1. Code Moved!
 
 The code of this project has been committed to th Apache Camel project. In future all changes will be directly send to the Apache SVN. So this repository will never be updated and is now outdated.
 
